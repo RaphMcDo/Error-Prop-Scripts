@@ -746,11 +746,11 @@ for (sub in 5:subs){
       }
       
       pred_midpoints<-data.frame(model=rep(mw_models,length(midpoints)*n_loc),
-                                 midpoints=rep(midpoints,each=length(mw_models)*nrow(gb_2023_surv)),
-                                 depth=rep(gb_2023_surv$depth,length(mw_models)*length(midpoints)),
-                                 loc=rep(1:234,length(mw_models)*length(midpoints)),
-                                 gam_loc=rep(match_gam_gb,length(mw_models)*length(midpoints)),
-                                 geometry=rep(gb_2023_surv$geometry,length(mw_models)*length(midpoints)),
+                                 midpoints=rep(rep(midpoints,each=length(mw_models)),nrow(gb_2023_surv)),
+                                 depth=rep(gb_2023_surv$depth,each=length(mw_models)*length(midpoints)),
+                                 loc=rep(1:234,each=length(mw_models)*length(midpoints)),
+                                 gam_loc=rep(match_gam_gb,each=length(mw_models)*length(midpoints)),
+                                 geometry=rep(gb_2023_surv$geometry,each=length(mw_models)*length(midpoints)),
                                  pred_mid=rep(NA,length(rep(mw_models,each=length(midpoints)*n_loc)))) %>% st_as_sf()
       
       for (i in 1:nrow(pred_midpoints)){
@@ -759,7 +759,7 @@ for (sub in 5:subs){
         if (pred_midpoints$model[i]==mw_models[3]) pred_midpoints$pred_mid[i]<-exp((boot_Report3$beta_depth[1])*log(pred_midpoints$depth[i])+(boot_Report3$beta[2])*log(pred_midpoints$midpoints[i]))
         if (pred_midpoints$model[i]==mw_models[4]) pred_midpoints$pred_mid[i]<-exp((boot_Report4$beta_depth[1])*log(pred_midpoints$depth[i])+(boot_Report4$beta_s[pred_midpoints$loc])[i]+(boot_Report4$beta[2])*log(pred_midpoints$midpoints[i]))
         if (pred_midpoints$model[i]==mw_models[5]) pred_midpoints$pred_mid[i]<-exp((boot_Report6$beta_depth[1])*log(pred_midpoints$depth[i])+((boot_Report6$beta_s[pred_midpoints$loc])[i]+(boot_Report6$beta[2]))*log(pred_midpoints$midpoints[i]))
-        if (pred_midpoints$model[i]==mw_models[5]) pred_midpoints$pred_mid[i]<-exp((boot_Report9$beta_depth[1])*log(pred_midpoints$depth[i])+(boot_Report9$beta_s[pred_midpoints$loc])[i]+((boot_Report9$beta_b_s[pred_midpoints$loc])[i]+(boot_Report9$beta[2]))*log(pred_midpoints$midpoints[i]))
+        if (pred_midpoints$model[i]==mw_models[6]) pred_midpoints$pred_mid[i]<-exp((boot_Report9$beta_depth[1])*log(pred_midpoints$depth[i])+(boot_Report9$beta_s[pred_midpoints$loc])[i]+((boot_Report9$beta_b_s[pred_midpoints$loc])[i]+(boot_Report9$beta[2]))*log(pred_midpoints$midpoints[i]))
       }
       
       long_heights$cut_heights<-cut(long_heights$heights/100,breaks=c(midpoints-0.025,1.675))
