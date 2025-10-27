@@ -11,14 +11,14 @@ library(sf)
 library(raster)
 library(mgcv)
 
-load("./LW_Work/all_mw.RData")
+load("./all_mw.RData")
 gb_2023_mw<-all_mw[which(all_mw$year==2023),] %>% st_as_sf(coords=c("lon","lat"))
 st_crs(gb_2023_mw)<-4326
 gb_2023_mw<-st_transform(gb_2023_mw,crs=32619)
-gb_2023_mw$geometry<-gb_2023_mw$geometry/10000
+gb_2023_mw$geometry<-gb_2023_mw$geometry/1000
 
 gb_2023_surv<-st_as_sf(bigbank[which(bigbank$year == 2023),],coords=c("lon","lat"))
-gb_2023_surv<-subset(gb_2023_surv, bank="GBb")
+# gb_2023_surv<-subset(gb_2023_surv, bank=="GBb")
 st_crs(gb_2023_surv)<-4326
 gb_2023_surv<-st_transform(gb_2023_surv,crs=32619)
 gb_2023_surv$geometry<-gb_2023_surv$geometry/1000
@@ -39,7 +39,7 @@ for (i in 1:nrow(gb_2023_mw)){
 
 sub_mw<-gb_2023_mw
 
-non_corrected_heights<-read.csv("./LW_Work/DR2023_13.csv")
+non_corrected_heights<-read.csv("./DR2023_13.csv")
 non_corrected_heights<-subset(non_corrected_heights,BIN_ID>95)
 non_corrected_heights$DEPTH_M<-non_corrected_heights$DEPTH_F*1.8288
 tot_scallops<-sum(non_corrected_heights$LIVE_RAW)
@@ -68,7 +68,7 @@ tow_end<-tow_end %>% st_transform(crs=32619)
 
 actual_dists<-data.frame(tow_id=gb_2023_surv$tow,dist=diag(st_distance(tow_start,tow_end)))
 
-tot_area<-sum(st_area(GB_surv_sf))
+tot_area<-3714.4+537.69
 
 midpoints<-seq(0.975,1.675,by=0.05)
 mw_models<-c("Offshore Current",
@@ -83,13 +83,13 @@ mw_models<-c("Offshore Current",
 methods<-c("Midpoint","Individual","Mean Height")
 
 #Models
-dyn.load(dynlib("./LW_Work/glmm_offshore_fixed_b"))
-dyn.load(dynlib("./LW_Work/glmm_offshore_fixed_b_lognormal"))
-dyn.load(dynlib("./LW_Work/depth_glmm_no_space"))
-dyn.load(dynlib("./LW_Work/spatial_depth_glmm_direct_cov"))
-dyn.load(dynlib("./LW_Work/spatial_depth_glmm_height"))
-dyn.load(dynlib("./LW_Work/spatial_depth_glmm_offshore"))
-dyn.load(dynlib("./LW_Work/spatial_both"))
+dyn.load(dynlib("./glmm_offshore_fixed_b"))
+dyn.load(dynlib("./glmm_offshore_fixed_b_lognormal"))
+dyn.load(dynlib("./depth_glmm_no_space"))
+dyn.load(dynlib("./spatial_depth_glmm_direct_cov"))
+dyn.load(dynlib("./spatial_depth_glmm_height"))
+dyn.load(dynlib("./spatial_depth_glmm_offshore"))
+dyn.load(dynlib("./spatial_both"))
 
 #Shell height portion of model!
 
@@ -141,8 +141,9 @@ nboot<-1000
 n_loc<-nrow(gb_2023_surv)
 
 tot_frame<-list()
-
-for(boot in 1:nboot){
+#load temp, at 450
+load("temp.RData")
+for(boot in 451:nboot){
 
   #Resampling meat weight
   boot_sub_mw<-sub_mw[sample(1:nrow(sub_mw),nrow(sub_mw),replace=T),]
@@ -557,12 +558,12 @@ for(boot in 1:nboot){
   for (i in 1:nrow(pred_midpoints)){
     if (pred_midpoints$model[i]==mw_models[1]) pred_midpoints$pred_mid[i]<-(surv.dat$CFh[pred_midpoints$gam_loc])[i]*pred_midpoints$midpoints[i]^3
     if (pred_midpoints$model[i]==mw_models[2]) pred_midpoints$pred_mid[i]<-(surv.dat2$CFh[pred_midpoints$gam_loc])[i]*pred_midpoints$midpoints[i]^3
-    if (pred_midpoints$model[i]==mw_models[3]) pred_midpoints$pred_mid[i]<-exp((summary(rep3)[2,1])*log(pred_midpoints$depth[i])+(summary(rep3)[1,1])*log(pred_midpoints$midpoints[i]))
-    if (pred_midpoints$model[i]==mw_models[4]) pred_midpoints$pred_mid[i]<-exp((summary(rep4)[4,1])*log(pred_midpoints$depth[i])+(Report4$beta_s[pred_midpoints$loc])[i]+(summary(rep4)[3,1])*log(pred_midpoints$midpoints[i]))
-    if (pred_midpoints$model[i]==mw_models[5]) pred_midpoints$pred_mid[i]<-exp((summary(rep6)[4,1])*log(pred_midpoints$depth[i])+((Report6$beta_s[pred_midpoints$loc])[i]+(summary(rep6)[3,1]))*log(pred_midpoints$midpoints[i]))
+    if (pred_midpoints$model[i]==mw_models[3]) pred_midpoints$pred_mid[i]<-exp((summary(rep3)[2,1])*log(pred_midpoints$depth[i])+(summary(rep3)[1,1])*log(pred_midpoints$midpoints[i])-exp(summary(rep3)[3,1])^2/2)
+    if (pred_midpoints$model[i]==mw_models[4]) pred_midpoints$pred_mid[i]<-exp((summary(rep4)[4,1])*log(pred_midpoints$depth[i])+(Report4$beta_s[pred_midpoints$loc])[i]+(summary(rep4)[3,1])*log(pred_midpoints$midpoints[i])-exp(summary(rep4)[5,1])^2/2)
+    if (pred_midpoints$model[i]==mw_models[5]) pred_midpoints$pred_mid[i]<-exp((summary(rep6)[4,1])*log(pred_midpoints$depth[i])+((Report6$beta_s[pred_midpoints$loc])[i]+(summary(rep6)[3,1]))*log(pred_midpoints$midpoints[i])-exp(summary(rep6)[5,1])^2/2)
     if (pred_midpoints$model[i]==mw_models[6]) pred_midpoints$pred_mid[i]<-(surv.dat7$CFh[pred_midpoints$gam_loc])[i]*pred_midpoints$midpoints[i]^(summary(rep7)[1,1])
     if (pred_midpoints$model[i]==mw_models[7]) pred_midpoints$pred_mid[i]<-(surv.dat8$CFh[pred_midpoints$gam_loc])[i]*pred_midpoints$midpoints[i]^(summary(rep8)[1,1])
-    if (pred_midpoints$model[i]==mw_models[8]) pred_midpoints$pred_mid[i]<-exp((summary(rep9)[6,1])*log(pred_midpoints$depth[i])+Report9$beta_s[pred_midpoints$loc[i]]+((Report9$beta_b_s[pred_midpoints$loc])[i]+(summary(rep9)[5,1]))*log(pred_midpoints$midpoints[i]))
+    if (pred_midpoints$model[i]==mw_models[8]) pred_midpoints$pred_mid[i]<-exp((summary(rep9)[6,1])*log(pred_midpoints$depth[i])+Report9$beta_s[pred_midpoints$loc[i]]+((Report9$beta_b_s[pred_midpoints$loc])[i]+(summary(rep9)[5,1]))*log(pred_midpoints$midpoints[i])-exp(summary(rep9)[7,1])^2/2)
   }
 
   long_heights$cut_heights<-cut(long_heights$heights/100,breaks=c(midpoints-0.025,1.7))
@@ -603,15 +604,26 @@ for(boot in 1:nboot){
   new_long_heights<-long_heights
   new_long_heights<-new_long_heights[order(new_long_heights$tow_id),]
 
+  # for (model in 1:length(mw_models)){
+  #   if (model == 1) new_long_heights$off<-(surv.dat$CFh[rematch_gam])*(new_long_heights$heights/100)^3
+  #   if (model == 2) new_long_heights$off_ln<-(surv.dat2$CFh[rematch_gam])*(new_long_heights$heights/100)^3
+  #   if (model == 3) new_long_heights$insh<-exp((summary(rep3)[2,1])*log(new_long_heights$depth)+(summary(rep3)[1,1])*log(new_long_heights$heights/100))
+  #   if (model == 4) new_long_heights$spat<-exp((summary(rep4)[4,1])*log(new_long_heights$depth)+(Report4$beta_s[new_long_heights$tow_id])+(summary(rep4)[3,1])*log(new_long_heights$heights/100))
+  #   if (model == 5) new_long_heights$spat_off<-exp((summary(rep6)[4,1])*log(new_long_heights$depth)+((Report6$beta_s[new_long_heights$tow_id])+(summary(rep6)[3,1]))*log(new_long_heights$heights/100))
+  #   if (model == 6) new_long_heights$off_est<-(surv.dat7$CFh[rematch_gam])*(new_long_heights$heights/100)^(summary(rep7)[1,1])
+  #   if (model == 7) new_long_heights$off_ln_est<-(surv.dat8$CFh[rematch_gam])*(new_long_heights$heights/100)^(summary(rep8)[1,1])
+  #   if (model == 8) new_long_heights$spat_both<-exp((summary(rep9)[6,1])*log(new_long_heights$depth)+Report9$beta_s[new_long_heights$tow_id]+((Report9$beta_b_s[new_long_heights$tow_id])+(summary(rep9)[5,1]))*log(new_long_heights$heights/100))
+  # }
+  
   for (model in 1:length(mw_models)){
-    if (model == 1) new_long_heights$off<-(surv.dat$CFh[rematch_gam])*(new_long_heights$heights/100)^3
-    if (model == 2) new_long_heights$off_ln<-(surv.dat2$CFh[rematch_gam])*(new_long_heights$heights/100)^3
-    if (model == 3) new_long_heights$insh<-exp((summary(rep3)[2,1])*log(new_long_heights$depth)+(summary(rep3)[1,1])*log(new_long_heights$heights/100))
-    if (model == 4) new_long_heights$spat<-exp((summary(rep4)[4,1])*log(new_long_heights$depth)+(Report4$beta_s[new_long_heights$tow_id])+(summary(rep4)[3,1])*log(new_long_heights$heights/100))
-    if (model == 5) new_long_heights$spat_off<-exp((summary(rep6)[4,1])*log(new_long_heights$depth)+((Report6$beta_s[new_long_heights$tow_id])+(summary(rep6)[3,1]))*log(new_long_heights$heights/100))
-    if (model == 6) new_long_heights$off_est<-(surv.dat7$CFh[rematch_gam])*(new_long_heights$heights/100)^(summary(rep7)[1,1])
-    if (model == 7) new_long_heights$off_ln_est<-(surv.dat8$CFh[rematch_gam])*(new_long_heights$heights/100)^(summary(rep8)[1,1])
-    if (model == 8) new_long_heights$spat_both<-exp((summary(rep9)[6,1])*log(new_long_heights$depth)+Report9$beta_s[new_long_heights$tow_id]+((Report9$beta_b_s[new_long_heights$tow_id])+(summary(rep9)[5,1]))*log(new_long_heights$heights/100))
+    if (model == 1) new_long_heights$off<-(surv.dat$CFh[rematch_gam]+rnorm(length(surv.dat$CFh[rematch_gam]),0,sqrt(CF.fit$sig2)))*(new_long_heights$heights/100)^3
+    if (model == 2) new_long_heights$off_ln<-(surv.dat2$CFh[rematch_gam]+rnorm(length(surv.dat2$CFh[rematch_gam]),0,sqrt(CF.fit2$sig2)))*(new_long_heights$heights/100)^3
+    if (model == 3) new_long_heights$insh<-exp(rnorm(length(new_long_heights$heights),0,exp(summary(rep3)[3,1]))+(summary(rep3)[2,1])*log(new_long_heights$depth)+(summary(rep3)[1,1])*log(new_long_heights$heights/100))
+    if (model == 4) new_long_heights$spat<-exp(rnorm(length(new_long_heights$heights),0,exp(summary(rep4)[5,1]))+(summary(rep4)[4,1])*log(new_long_heights$depth)+(Report4$beta_s[new_long_heights$tow_id])+(summary(rep4)[3,1])*log(new_long_heights$heights/100))
+    if (model == 5) new_long_heights$spat_off<-exp(rnorm(length(new_long_heights$heights),0,exp(summary(rep6)[5,1]))+(summary(rep6)[4,1])*log(new_long_heights$depth)+((Report6$beta_s[new_long_heights$tow_id])+(summary(rep6)[3,1]))*log(new_long_heights$heights/100))
+    if (model == 6) new_long_heights$off_est<-(surv.dat7$CFh[rematch_gam]+rnorm(length(surv.dat7$CFh[rematch_gam]),0,sqrt(CF.fit7$sig2)))*(new_long_heights$heights/100)^(summary(rep7)[1,1])
+    if (model == 7) new_long_heights$off_ln_est<-(surv.dat8$CFh[rematch_gam]+rnorm(length(surv.dat8$CFh[rematch_gam]),0,sqrt(CF.fit8$sig2)))*(new_long_heights$heights/100)^(summary(rep8)[1,1])
+    if (model == 8) new_long_heights$spat_both<-exp(rnorm(length(new_long_heights$heights),0,exp(summary(rep9)[7,1]))+(summary(rep9)[6,1])*log(new_long_heights$depth)+Report9$beta_s[new_long_heights$tow_id]+((Report9$beta_b_s[new_long_heights$tow_id])+(summary(rep9)[5,1]))*log(new_long_heights$heights/100))
   }
 
   blep<-data.frame(heights=mean(new_long_heights$heights),depth=mean(new_long_heights$depth),
@@ -701,6 +713,7 @@ for(boot in 1:nboot){
                         est=c(as.numeric(calc_tot[[1]][-9]),as.numeric(calc_tot[[2]][-9]),as.numeric(calc_tot[[3]][-9])))
 
 }
+save(tot_frame,file="temp.RData")
 
 final_tot_frame<-tot_frame[[1]]
 for (i in 2:nboot){

@@ -610,7 +610,7 @@ for (i in 1:nrow(pred_midpoints)){
     pred_midpoints$se[i]<-sqrt((surv.dat2$se[pred_midpoints$gam_loc][i])^2 * (pred_midpoints$midpoints[i]^3)^2)
   }
   if (pred_midpoints$model[i]==mw_models[3]) {
-    pred_midpoints$pred_mid[i]<-exp((summary(rep3)[2,1])*log(pred_midpoints$depth[i])+(summary(rep3)[1,1])*log(pred_midpoints$midpoints[i]))
+    pred_midpoints$pred_mid[i]<-exp((summary(rep3)[2,1])*log(pred_midpoints$depth[i])+(summary(rep3)[1,1])*log(pred_midpoints$midpoints[i])-exp(summary(rep3)[3,1])^2/2)
     pred_midpoints$se[i]<-sqrt(sum(c(summary_rep3_cov[1,1] * log(pred_midpoints$depth[i])^2,
                                      summary_rep3_cov[2,2] * log(pred_midpoints$midpoints[i])^2,
                                      2*(summary_rep3_cov[1,2]*log(pred_midpoints$depth[i])*log(pred_midpoints$midpoints[i])))))
@@ -618,7 +618,7 @@ for (i in 1:nrow(pred_midpoints)){
   if (pred_midpoints$model[i]==mw_models[4]) {
     temp_cov<-rep4$cov[c(which(names(rep4$value)=="beta_depth")[1],which(names(rep4$value)=="beta")[2],which(names(rep4$value)=="beta_s")[pred_midpoints$loc][i]),
                        c(which(names(rep4$value)=="beta_depth")[1],which(names(rep4$value)=="beta")[2],which(names(rep4$value)=="beta_s")[pred_midpoints$loc][i])]
-    pred_midpoints$pred_mid[i]<-exp((summary(rep4)[4,1])*log(pred_midpoints$depth[i])+(Report4$beta_s[pred_midpoints$loc])[i]+(summary(rep4)[3,1])*log(pred_midpoints$midpoints[i]))
+    pred_midpoints$pred_mid[i]<-exp((summary(rep4)[4,1])*log(pred_midpoints$depth[i])+(Report4$beta_s[pred_midpoints$loc])[i]+(summary(rep4)[3,1])*log(pred_midpoints$midpoints[i])-exp(summary(rep4)[5,1])^2/2)
     pred_midpoints$se[i]<-sqrt(sum(c(temp_cov[1,1]*log(pred_midpoints$depth[i])^2,
                                      temp_cov[3,3],
                                      temp_cov[2,2]*log(pred_midpoints$midpoints[i])^2),
@@ -629,7 +629,7 @@ for (i in 1:nrow(pred_midpoints)){
   if (pred_midpoints$model[i]==mw_models[5]) {
     temp_cov<-rep6$cov[c(which(names(rep6$value)=="beta_depth")[1],which(names(rep6$value)=="beta")[2],which(names(rep6$value)=="beta_s")[pred_midpoints$loc][i]),
                        c(which(names(rep6$value)=="beta_depth")[1],which(names(rep6$value)=="beta")[2],which(names(rep6$value)=="beta_s")[pred_midpoints$loc][i])]
-    pred_midpoints$pred_mid[i]<-exp((summary(rep6)[4,1])*log(pred_midpoints$depth[i])+((Report6$beta_s[pred_midpoints$loc])[i]+(summary(rep6)[3,1]))*log(pred_midpoints$midpoints[i]))
+    pred_midpoints$pred_mid[i]<-exp((summary(rep6)[4,1])*log(pred_midpoints$depth[i])+((Report6$beta_s[pred_midpoints$loc])[i]+(summary(rep6)[3,1]))*log(pred_midpoints$midpoints[i])-exp(summary(rep6)[5,1])^2/2)
     pred_midpoints$se[i]<-sqrt(sum(c(temp_cov[1,1]*log(pred_midpoints$depth[i])^2,
                                      temp_cov[3,3]*log(pred_midpoints$midpoints[i])^2,
                                      temp_cov[2,2]*log(pred_midpoints$midpoints[i])^2),
@@ -648,7 +648,7 @@ for (i in 1:nrow(pred_midpoints)){
   if (pred_midpoints$model[i]==mw_models[8]) {
     temp_cov<-rep9$cov[c(which(names(rep9$value)=="beta_depth")[1],which(names(rep9$value)=="beta")[2],which(names(rep9$value)=="beta_s")[pred_midpoints$loc][i],which(names(rep9$value)=="beta_b_s")[pred_midpoints$loc][i]),
                        c(which(names(rep9$value)=="beta_depth")[1],which(names(rep9$value)=="beta")[2],which(names(rep9$value)=="beta_s")[pred_midpoints$loc][i],which(names(rep9$value)=="beta_b_s")[pred_midpoints$loc][i])]
-    pred_midpoints$pred_mid[i]<-exp((summary(rep9)[6,1])*log(pred_midpoints$depth[i])+Report9$beta_s[pred_midpoints$loc[i]]+((Report9$beta_b_s[pred_midpoints$loc])[i]+(summary(rep9)[5,1]))*log(pred_midpoints$midpoints[i]))
+    pred_midpoints$pred_mid[i]<-exp((summary(rep9)[6,1])*log(pred_midpoints$depth[i])+Report9$beta_s[pred_midpoints$loc[i]]+((Report9$beta_b_s[pred_midpoints$loc])[i]+(summary(rep9)[5,1]))*log(pred_midpoints$midpoints[i])-exp(summary(rep9)[7,1])^2/2)
     pred_midpoints$se[i]<-sqrt(sum(c(temp_cov[1,1]*log(pred_midpoints$depth[i])^2,
                                      temp_cov[4,4]*log(pred_midpoints$midpoints[i])^2,
                                      temp_cov[2,2]*log(pred_midpoints$midpoints[i])^2,
@@ -747,7 +747,7 @@ for (model in 1:length(mw_models)){
     new_long_heights_se$off_ln<-sqrt((surv.dat2$se[rematch_gam]^2)*((new_long_heights$heights/100)^3)^2)
   }  
   if (model == 3) {
-    new_long_heights$insh<-exp((summary(rep3)[2,1])*log(new_long_heights$depth)+(summary(rep3)[1,1])*log(new_long_heights$heights/100))
+    new_long_heights$insh<-exp((summary(rep3)[2,1])*log(new_long_heights$depth)+(summary(rep3)[1,1])*log(new_long_heights$heights/100)-exp(summary(rep3)[3,1])^2/2)
     new_long_heights_se$insh<-sqrt(rowSums(data.frame(c(summary_rep3_cov[1,1] * log(new_long_heights$depth)^2),
                                                       c(summary_rep3_cov[2,2] *log(new_long_heights$heights/100)^2),
                                                       c(2*(summary_rep3_cov[1,2]* log(new_long_heights$depth)*log(new_long_heights$heights/100))))))
@@ -756,7 +756,7 @@ for (model in 1:length(mw_models)){
     for (i in 1:nrow(new_long_heights)){
       temp_cov<-rep4$cov[c(which(names(rep4$value)=="beta_depth")[1],which(names(rep4$value)=="beta")[2],which(names(rep4$value)=="beta_s")[new_long_heights$tow_id][i]),
                          c(which(names(rep4$value)=="beta_depth")[1],which(names(rep4$value)=="beta")[2],which(names(rep4$value)=="beta_s")[new_long_heights$tow_id][i])]
-      new_long_heights$spat[i]<-exp((summary(rep4)[4,1])*log(new_long_heights$depth[i])+(Report4$beta_s[new_long_heights$tow_id][i])+(summary(rep4)[3,1])*log(new_long_heights$heights[i]/100))
+      new_long_heights$spat[i]<-exp((summary(rep4)[4,1])*log(new_long_heights$depth[i])+(Report4$beta_s[new_long_heights$tow_id][i])+(summary(rep4)[3,1])*log(new_long_heights$heights[i]/100)-exp(summary(rep4)[5,1])^2/2)
       new_long_heights_se$spat[i]<-sqrt(sum(c(temp_cov[1,1]*log(new_long_heights$depth[i])^2,
                                            temp_cov[3,3],
                                            temp_cov[2,2]*log(new_long_heights$heights[i]/100)^2,
@@ -769,7 +769,7 @@ for (model in 1:length(mw_models)){
     for (i in 1:nrow(new_long_heights)){
       temp_cov<-rep6$cov[c(which(names(rep6$value)=="beta_depth")[1],which(names(rep6$value)=="beta")[2],which(names(rep6$value)=="beta_s")[new_long_heights$tow_id][i]),
                          c(which(names(rep6$value)=="beta_depth")[1],which(names(rep6$value)=="beta")[2],which(names(rep6$value)=="beta_s")[new_long_heights$tow_id][i])]
-      new_long_heights$spat_off[i]<-exp((summary(rep6)[4,1])*log(new_long_heights$depth[i])+((Report6$beta_s[new_long_heights$tow_id][i])+(summary(rep6)[3,1]))*log(new_long_heights$heights[i]/100))
+      new_long_heights$spat_off[i]<-exp((summary(rep6)[4,1])*log(new_long_heights$depth[i])+((Report6$beta_s[new_long_heights$tow_id][i])+(summary(rep6)[3,1]))*log(new_long_heights$heights[i]/100)-exp(summary(rep6)[5,1])^2/2)
       new_long_heights_se$spat_off[i]<-sqrt(sum(c(temp_cov[1,1]*log(new_long_heights$depth[i])^2),
                                                 c(temp_cov[3,3]*log(new_long_heights$heights[i]/100)^2),
                                                 c(temp_cov[2,2]*log(new_long_heights$heights[i]/100)^2),
@@ -790,7 +790,7 @@ for (model in 1:length(mw_models)){
     for (i in 1:nrow(new_long_heights)){
       temp_cov<-rep9$cov[c(which(names(rep9$value)=="beta_depth")[1],which(names(rep9$value)=="beta")[2],which(names(rep9$value)=="beta_s")[new_long_heights$tow_id][i],which(names(rep9$value)=="beta_b_s")[new_long_heights$tow_id][i]),
                          c(which(names(rep9$value)=="beta_depth")[1],which(names(rep9$value)=="beta")[2],which(names(rep9$value)=="beta_s")[new_long_heights$tow_id][i],which(names(rep9$value)=="beta_b_s")[new_long_heights$tow_id][i])]
-      new_long_heights$spat_both[i]<-exp((summary(rep9)[6,1])*log(new_long_heights$depth[i])+Report9$beta_s[new_long_heights$tow_id][i]+((Report9$beta_b_s[new_long_heights$tow_id])[i]+(summary(rep9)[5,1]))*log(new_long_heights$heights[i]/100))
+      new_long_heights$spat_both[i]<-exp((summary(rep9)[6,1])*log(new_long_heights$depth[i])+Report9$beta_s[new_long_heights$tow_id][i]+((Report9$beta_b_s[new_long_heights$tow_id])[i]+(summary(rep9)[5,1]))*log(new_long_heights$heights[i]/100)-exp(summary(rep9)[7,1])^2/2)
       new_long_heights_se$spat_both[i]<-sqrt(sum(c(temp_cov[1,1]*log(new_long_heights$depth[i])^2,
                                                    temp_cov[4,4]*log(new_long_heights$heights[i]/100)^2,
                                                    temp_cov[2,2]*log(new_long_heights$heights[i]/100)^2,
@@ -878,7 +878,7 @@ for (model in 1:length(mw_models)){
   }  
   if (model == 3) {
     # all_small_heights$insh<-(exp((summary(rep3)[2,1])*log(all_small_heights$depth)+(summary(rep3)[1,1])*log(all_small_heights$pred_heights)))
-    all_small_heights$insh<-(exp((summary(rep3)[2,1])*log(all_small_heights$depth)+(summary(rep3)[1,1])*log(all_small_heights$pred_heights)))+(0.5*exp((summary(rep3)[2,1])*log(all_small_heights$depth))*(summary(rep3)[1,1]-1)*(summary(rep3)[1,1])*exp((summary(rep3)[1,1]-2)*log(all_small_heights$pred_heights))*heights_var$var)
+    all_small_heights$insh<-(exp((summary(rep3)[2,1])*log(all_small_heights$depth)+(summary(rep3)[1,1])*log(all_small_heights$pred_heights)-exp(summary(rep3)[3,1])^2/2))+(0.5*exp((summary(rep3)[2,1])*log(all_small_heights$depth))*(summary(rep3)[1,1]-1)*(summary(rep3)[1,1])*exp((summary(rep3)[1,1]-2)*log(all_small_heights$pred_heights))*heights_var$var)
     all_small_heights_se$insh<-sqrt(rowSums(data.frame(c(summary_rep3_cov[1,1] * log(all_small_heights$depth)^2),
                                                        c(summary_rep3_cov[2,2] *log(all_small_heights$pred_heights)^2),
                                                        c(2*(summary_rep3_cov[1,2]* log(all_small_heights$depth)*log(all_small_heights$pred_heights))))))
@@ -893,7 +893,7 @@ for (model in 1:length(mw_models)){
       temp_cov<-rep4$cov[c(which(names(rep4$value)=="beta_depth")[1],which(names(rep4$value)=="beta")[2],which(names(rep4$value)=="beta_s")[all_small_heights$tow_id][i]),
                          c(which(names(rep4$value)=="beta_depth")[1],which(names(rep4$value)=="beta")[2],which(names(rep4$value)=="beta_s")[all_small_heights$tow_id][i])]
       # all_small_heights$spat[i]<-(exp((summary(rep4)[4,1])*log(all_small_heights$depth[i])+(Report4$beta_s[all_small_heights$tow_id][i])+(summary(rep4)[3,1])*log(all_small_heights$pred_heights[i])))
-      all_small_heights$spat[i]<-(exp((summary(rep4)[4,1])*log(all_small_heights$depth[i])+(Report4$beta_s[all_small_heights$tow_id][i])+(summary(rep4)[3,1])*log(all_small_heights$pred_heights[i])))+(0.5*exp((summary(rep4)[4,1])*log(all_small_heights$depth[i])+(Report4$beta_s[all_small_heights$tow_id][i]))*(summary(rep4)[3,1]-1)*summary(rep4)[3,1]*exp((summary(rep4)[3,1]-2)*log(all_small_heights$pred_heights[i]))*heights_var$var[i])
+      all_small_heights$spat[i]<-(exp((summary(rep4)[4,1])*log(all_small_heights$depth[i])+(Report4$beta_s[all_small_heights$tow_id][i])+(summary(rep4)[3,1])*log(all_small_heights$pred_heights[i])-exp(summary(rep4)[5,1])^2/2))+(0.5*exp((summary(rep4)[4,1])*log(all_small_heights$depth[i])+(Report4$beta_s[all_small_heights$tow_id][i]))*(summary(rep4)[3,1]-1)*summary(rep4)[3,1]*exp((summary(rep4)[3,1]-2)*log(all_small_heights$pred_heights[i]))*heights_var$var[i])
       var_bheight<-temp_cov[2,2] * log(all_small_heights$pred_heights[i])^2 + temp_cov[2,2]*(all_small_heights$pred_heights[i]^(-2)*all_small_heights_comb_se$var[i])+ (all_small_heights$pred_heights[i]^(-2)*all_small_heights_comb_se$var[i])*summary(rep4)[3,1]^2
       all_small_heights_se$spat[i]<-sqrt(sum(c(temp_cov[1,1]*log(all_small_heights$depth[i])^2,
                                                temp_cov[3,3],
@@ -915,7 +915,7 @@ for (model in 1:length(mw_models)){
       temp_cov<-rep6$cov[c(which(names(rep6$value)=="beta_depth")[1],which(names(rep6$value)=="beta")[2],which(names(rep6$value)=="beta_s")[all_small_heights$tow_id][i]),
                          c(which(names(rep6$value)=="beta_depth")[1],which(names(rep6$value)=="beta")[2],which(names(rep6$value)=="beta_s")[all_small_heights$tow_id][i])]
       # all_small_heights$spat_off[i]<-(exp((summary(rep6)[4,1])*log(all_small_heights$depth[i])+((Report6$beta_s[all_small_heights$tow_id][i])+(summary(rep6)[3,1]))*log(all_small_heights$pred_heights[i]))) 
-      all_small_heights$spat_off[i]<-(exp((summary(rep6)[4,1])*log(all_small_heights$depth[i])+((Report6$beta_s[all_small_heights$tow_id][i])+(summary(rep6)[3,1]))*log(all_small_heights$pred_heights[i]))) + (0.5*exp(summary(rep6)[4,1]*log(all_small_heights$depth[i]))*((Report6$beta_s[all_small_heights$tow_id][i])+(summary(rep6)[3,1])-1)*((Report6$beta_s[all_small_heights$tow_id][i])+(summary(rep6)[3,1]))*exp(((Report6$beta_s[all_small_heights$tow_id][i])+(summary(rep6)[3,1])-2)*log(all_small_heights$pred_heights[i]))*heights_var$var[i])
+      all_small_heights$spat_off[i]<-(exp((summary(rep6)[4,1])*log(all_small_heights$depth[i])+((Report6$beta_s[all_small_heights$tow_id][i])+(summary(rep6)[3,1]))*log(all_small_heights$pred_heights[i])-exp(summary(rep6)[5,1])^2/2)) + (0.5*exp(summary(rep6)[4,1]*log(all_small_heights$depth[i]))*((Report6$beta_s[all_small_heights$tow_id][i])+(summary(rep6)[3,1])-1)*((Report6$beta_s[all_small_heights$tow_id][i])+(summary(rep6)[3,1]))*exp(((Report6$beta_s[all_small_heights$tow_id][i])+(summary(rep6)[3,1])-2)*log(all_small_heights$pred_heights[i]))*heights_var$var[i])
       var_field_height<-temp_cov[3,3] * log(all_small_heights$pred_heights[i])^2 + temp_cov[3,3]*(all_small_heights$pred_heights[i]^(-2)*all_small_heights_comb_se$var[i])+ (all_small_heights$pred_heights[i]^(-2)*all_small_heights_comb_se$var[i])*rep6$value[which(names(rep6$value)=="beta_s")][all_small_heights$tow_id][i]^2
       var_bheight<-temp_cov[2,2] * log(all_small_heights$pred_heights[i])^2 + temp_cov[2,2]*(all_small_heights$pred_heights[i]^(-2)*all_small_heights_comb_se$var[i])+ (all_small_heights$pred_heights[i]^(-2)*all_small_heights_comb_se$var[i])*summary(rep6)[3,1]^2
       all_small_heights_se$spat_off[i]<-sqrt(sum(c(temp_cov[1,1]*log(all_small_heights$depth[i])^2),
@@ -951,7 +951,7 @@ for (model in 1:length(mw_models)){
       var_field_height<-temp_cov[4,4] * log(all_small_heights$pred_heights[i])^2 + temp_cov[4,4]*(all_small_heights$pred_heights[i]^(-2)*all_small_heights_comb_se$var[i])+ (all_small_heights$pred_heights[i]^(-2)*all_small_heights_comb_se$var[i])*rep9$value[which(names(rep9$value)=="beta_b_s")][all_small_heights$tow_id][i]^2
       var_bheight<-temp_cov[2,2] * log(all_small_heights$pred_heights[i])^2 + temp_cov[2,2]*(all_small_heights$pred_heights[i]^(-2)*all_small_heights_comb_se$var[i])+ (all_small_heights$pred_heights[i]^(-2)*all_small_heights_comb_se$var[i])*summary(rep9)[5,1]^2
       # all_small_heights$spat_both[i]<-exp((summary(rep9)[6,1])*log(all_small_heights$depth[i])+Report9$beta_s[all_small_heights$tow_id][i]+((Report9$beta_b_s[all_small_heights$tow_id])[i]+(summary(rep9)[5,1]))*log(all_small_heights$pred_heights[i]))
-      all_small_heights$spat_both[i]<-exp((summary(rep9)[6,1])*log(all_small_heights$depth[i])+Report9$beta_s[all_small_heights$tow_id][i]+((Report9$beta_b_s[all_small_heights$tow_id])[i]+(summary(rep9)[5,1]))*log(all_small_heights$pred_heights[i]))+(0.5*exp((summary(rep9)[6,1])*log(all_small_heights$depth[i])+Report9$beta_s[all_small_heights$tow_id][i])*((Report9$beta_b_s[all_small_heights$tow_id])[i]+(summary(rep9)[5,1])-1)*((Report9$beta_b_s[all_small_heights$tow_id])[i]+(summary(rep9)[5,1]))*exp(((Report9$beta_b_s[all_small_heights$tow_id])[i]+(summary(rep9)[5,1])-2)*log(all_small_heights$pred_heights[i]))*heights_var$var[i])
+      all_small_heights$spat_both[i]<-exp((summary(rep9)[6,1])*log(all_small_heights$depth[i])+Report9$beta_s[all_small_heights$tow_id][i]+((Report9$beta_b_s[all_small_heights$tow_id])[i]+(summary(rep9)[5,1]))*log(all_small_heights$pred_heights[i])-exp(summary(rep9)[7,1])^2/2)+(0.5*exp((summary(rep9)[6,1])*log(all_small_heights$depth[i])+Report9$beta_s[all_small_heights$tow_id][i])*((Report9$beta_b_s[all_small_heights$tow_id])[i]+(summary(rep9)[5,1])-1)*((Report9$beta_b_s[all_small_heights$tow_id])[i]+(summary(rep9)[5,1]))*exp(((Report9$beta_b_s[all_small_heights$tow_id])[i]+(summary(rep9)[5,1])-2)*log(all_small_heights$pred_heights[i]))*heights_var$var[i])
       all_small_heights_se$spat_both[i]<-sqrt(sum(c(temp_cov[1,1]*log(all_small_heights$depth[i])^2,
                                                    temp_cov[4,4]*log(all_small_heights$pred_heights[i])^2,
                                                    temp_cov[2,2]*log(all_small_heights$pred_heights[i])^2,
@@ -1300,4 +1300,11 @@ straight_mean_calc$sd<-aggregate(val~model,data=temp_sums,FUN=sd)$val
 straight_mean_calc$se<-straight_mean_calc$sd/sqrt(234)
 straight_mean_calc$high<-straight_mean_calc$mean+1.96*straight_mean_calc$se
 straight_mean_calc$low<-straight_mean_calc$mean-1.96*straight_mean_calc$se
+save(tot_frame,straight_mean_calc,)
 
+# ggplot()+geom_point(data=subset(tot_frame,model %in% mw_models[c(1:5,8)]),aes(x=model,y=est,col=model))+
+#   geom_errorbar(data=subset(tot_frame,model %in% mw_models[c(1:5,8)]),(aes(x=model,ymax=high,ymin=low,col=model)))+
+#   scale_color_viridis_d(name="LW Model")+
+#   theme_bw()+
+#   theme(axis.p)
+#   facet_wrap(~method)

@@ -12,7 +12,7 @@ library(raster)
 library(mgcv)
 
 
-load("./LW_Work/all_mw.RData")
+load("all_mw.RData")
 gb_2023_mw<-all_mw %>% st_as_sf(coords=c("lon","lat"))
 st_crs(gb_2023_mw)<-4326
 gb_2023_mw<-st_transform(gb_2023_mw,crs=32619)
