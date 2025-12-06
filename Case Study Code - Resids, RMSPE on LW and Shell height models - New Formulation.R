@@ -208,7 +208,7 @@ parameters = list(
   log_phi = log(0.1))
 
 maps <- list(
-  beta = factor(c(NA,2)),
+  # beta = factor(c(NA,2)),
   beta_depth=factor(c(1,NA))
 )
 
@@ -249,7 +249,7 @@ parameters = list(
   log_phi = log(0.1))
 
 maps <- list(
-  beta = factor(c(NA,2)),
+  # beta = factor(c(NA,2)),
   beta_depth=factor(c(1,NA)),
   log_nu=factor(NA)
 )
@@ -366,7 +366,7 @@ parameters = list(
 maps <- list(
   # beta = factor(rep(NA, nvar)),
   # beta = factor(c(2,NA)),
-  beta = factor(c(NA,2)),
+  # beta = factor(c(NA,2)),
   # beta = factor(c(3,2)),
   beta_depth=factor(c(1,NA)),
   log_nu=factor(NA)
@@ -539,7 +539,7 @@ parameters = list(
   log_phi = log(0.1))
 
 maps <- list(
-  beta = factor(c(NA,2)),
+  # beta = factor(c(NA,2)),
   beta_depth=factor(c(1,NA)),
   log_nu=factor(NA),
   log_nu_b=factor(NA)
@@ -669,18 +669,18 @@ big_resid_plot<-ggplot(data=subset(all_resids,model==7),aes(sample=resids))+
   ylab("Sample Quantiles")+xlab("Theoretical Quantiles")+
   theme_bw()+
   facet_wrap(~model,scales="free",labeller=facet_labeller)
-  # facet_wrap(~model,scales="free",labeller=facet_labeller2)
-  # facet_wrap(~model,scales="free",labeller=mw_labeller)
+# facet_wrap(~model,scales="free",labeller=facet_labeller2)
+# facet_wrap(~model,scales="free",labeller=mw_labeller)
 
 # big_scedast_plot<-ggplot(data=all_resids,aes(y=resids,x=fitted))+
 # big_scedast_plot<-ggplot(data=all_resids2,aes(y=resids,x=fitted))+
 big_scedast_plot<-ggplot(data=mw_resids,aes(y=resids,x=fitted))+
-# big_scedast_plot<-ggplot(data=subset(all_resids,model==7),aes(y=resids,x=fitted))+
+  # big_scedast_plot<-ggplot(data=subset(all_resids,model==7),aes(y=resids,x=fitted))+
   geom_point()+
   ylab("Residuals")+xlab("Fitted Values")+
   theme_bw()+
-# facet_wrap(~model,scales="free",labeller=facet_labeller)
-# facet_wrap(~model,scales="free",labeller=facet_labeller2)
+  # facet_wrap(~model,scales="free",labeller=facet_labeller)
+  # facet_wrap(~model,scales="free",labeller=facet_labeller2)
   facet_wrap(~model,scales="free",labeller=mw_labeller)
 
 mean_resids_tow<-aggregate(resids~model+ids,data=all_resids,FUN=mean)
@@ -705,8 +705,8 @@ spat_mean_resid<-ggplot()+
                         low="blue",mid="white",high="red")+
   scale_size(name="Number of observations")+
   facet_wrap(~model,labeller=facet_labeller)
-  # facet_wrap(~model,labeller=facet_labeller2)
-  # facet_wrap(~model,labeller=mw_labeller)
+# facet_wrap(~model,labeller=facet_labeller2)
+# facet_wrap(~model,labeller=mw_labeller)
 
 spat_median_resid<-ggplot()+
   # geom_sf(data=median_resids_tow,aes(col=resids,size=n))+
@@ -742,52 +742,52 @@ parameters = list(
   log_upsilon = log(0.5))
 
 #Does stratified on factors, so if I give it factors of tow, then should work
-set.seed(921)
-folds<-createFolds(as.factor(long_heights$tow_id),k=10,returnTrain = T)
-
-for (fold in 1:10){
-
-  test_heights[[fold]]<-long_heights[folds[[fold]],]
-  pred_heights[[fold]]<-long_heights[-folds[[fold]],]
-
-  tmb_data<-list(varmat_sh=as.matrix(cbind(rep(1,nrow(test_heights[[fold]])))),
-                 depth_sh=test_heights[[fold]]$depth,
-                 ind_loc_sh=test_heights[[fold]]$tow_id-1,
-                 locations=st_coordinates(gb_2023_surv),
-                 s_heights=test_heights[[fold]]$heights/10,
-                 a_b_truncation=c(9.5,17))
-
-  maps <- list(
-    log_nu=c(factor(NA))#
-  )
-
-  height_obj[[fold]] = MakeADFun(data=tmb_data,
-                   parameters=parameters,
-                   map=maps,
-                   random=c("beta_sh_s"),
-                   DLL="spatial_depth_glmm_height",
-                   silent = F)
-
-  height_Opt[[fold]]<-optimx::optimr(height_obj[[fold]]$par,height_obj[[fold]]$fn,height_obj[[fold]]$gr,
-                       control=list(maxit=100000,maxeval=100000),
-                       method="nlminb")
-
-  height_rep[[fold]]<-sdreport(height_obj[[fold]],bias.correct=F)
-
-  height_Report[[fold]]<-height_obj[[fold]]$report()
-
-  upsilon<-exp(height_rep[[fold]]$value[which(names(height_rep[[fold]]$value)=="log_upsilon")])
-  mus<-(height_Report[[fold]]$beta_sh + height_Report[[fold]]$beta_sh_s[pred_heights[[fold]]$tow_id]+height_Report[[fold]]$beta_depth*pred_heights[[fold]]$depth)
-
-  pred_heights[[fold]]$pred_height<-mus +(((dnorm(9.5,mus,upsilon))-(dnorm(17,mus,upsilon)))/(pnorm(17,mus,upsilon)-pnorm(9.5,mus,upsilon)))*upsilon
-  pred_heights[[fold]]$squared_error<-(pred_heights[[fold]]$heights/10-pred_heights[[fold]]$pred_height)^2
-
-}
+# set.seed(921)
+# folds<-createFolds(as.factor(long_heights$tow_id),k=10,returnTrain = T)
+# 
+# for (fold in 1:10){
+#   
+#   test_heights[[fold]]<-long_heights[folds[[fold]],]
+#   pred_heights[[fold]]<-long_heights[-folds[[fold]],]
+#   
+#   tmb_data<-list(varmat_sh=as.matrix(cbind(rep(1,nrow(test_heights[[fold]])))),
+#                  depth_sh=test_heights[[fold]]$depth,
+#                  ind_loc_sh=test_heights[[fold]]$tow_id-1,
+#                  locations=st_coordinates(gb_2023_surv),
+#                  s_heights=test_heights[[fold]]$heights/10,
+#                  a_b_truncation=c(9.5,17))
+#   
+#   maps <- list(
+#     log_nu=c(factor(NA))#
+#   )
+#   
+#   height_obj[[fold]] = MakeADFun(data=tmb_data,
+#                                  parameters=parameters,
+#                                  map=maps,
+#                                  random=c("beta_sh_s"),
+#                                  DLL="spatial_depth_glmm_height",
+#                                  silent = F)
+#   
+#   height_Opt[[fold]]<-optimx::optimr(height_obj[[fold]]$par,height_obj[[fold]]$fn,height_obj[[fold]]$gr,
+#                                      control=list(maxit=100000,maxeval=100000),
+#                                      method="nlminb")
+#   
+#   height_rep[[fold]]<-sdreport(height_obj[[fold]],bias.correct=F)
+#   
+#   height_Report[[fold]]<-height_obj[[fold]]$report()
+#   
+#   upsilon<-exp(height_rep[[fold]]$value[which(names(height_rep[[fold]]$value)=="log_upsilon")])
+#   mus<-(height_Report[[fold]]$beta_sh + height_Report[[fold]]$beta_sh_s[pred_heights[[fold]]$tow_id]+height_Report[[fold]]$beta_depth*pred_heights[[fold]]$depth)
+#   
+#   pred_heights[[fold]]$pred_height<-mus +(((dnorm(9.5,mus,upsilon))-(dnorm(17,mus,upsilon)))/(pnorm(17,mus,upsilon)-pnorm(9.5,mus,upsilon)))*upsilon
+#   pred_heights[[fold]]$squared_error<-(pred_heights[[fold]]$heights/10-pred_heights[[fold]]$pred_height)^2
+#   
+# }
 
 mw_models<-c(mw_names[c(1,3,5:6,8,9)],
              "Offshore Estimating b",
              "Offshore LN Estimating")#,
-             #"Inshore Depth Tow LN GLMM")
+#"Inshore Depth Tow LN GLMM")
 mw_models[3]<-"Inshore Depth LN LMM"
 
 tmb_models<-c("glmm_offshore_fixed_b",
@@ -798,12 +798,12 @@ tmb_models<-c("glmm_offshore_fixed_b",
               "spatial_both",
               "glmm_offshore_fixed_b",
               "glmm_offshore_fixed_b_lognormal")#,
-              #"depth_glmm_tow_eff")
+#"depth_glmm_tow_eff")
 
 set.seed(0493)
 folds<-createFolds(as.factor(sub_mw$ID),k=10,returnTrain = T)
 
-# dyn.unload(dynlib("depth_glmm_tow_eff"))
+# dyn.unload(dynlib("./LW_Work/depth_glmm_tow_eff"))
 compile("depth_glmm_tow_eff.cpp")
 dyn.load(dynlib("depth_glmm_tow_eff"))
 
@@ -815,121 +815,122 @@ weight_rep<-list(off=list(),off_ln=list(),in_ln=list(),spat=list(),spat_off=list
 weight_Report<-list(off=list(),off_ln=list(),in_ln=list(),spat=list(),spat_off=list(),spat_both=list(),off_estim=list(),off_ln_estim=list())
 weight_MSPE<-list(off=list(),off_ln=list(),in_ln=list(),spat=list(),spat_off=list(),spat_both=list(),off_estim=list(),off_ln_estim=list())
 
-for (fold in 1:10){
-  for (model in 1:length(mw_models)){
+# for (fold in 1:10){
+#   for (model in 1:length(mw_models)){
+#     
+#     test_weights[[fold]]<-sub_mw[folds[[fold]],]
+#     pred_weights[[fold]]<-sub_mw[-folds[[fold]],]
+#     
+#     tmb_data<-list(weight=test_weights[[fold]]$wmw,
+#                    heights=test_weights[[fold]]$sh/100,
+#                    tow_id=as.integer(as.factor(test_weights[[fold]]$ID))-1,
+#                    weight=test_weights[[fold]]$wmw,
+#                    varmat=as.matrix(cbind(1, log(test_weights[[fold]]$sh/100))),
+#                    depth=test_weights[[fold]]$depth,
+#                    ind_loc=test_weights[[fold]]$id_loc2-1,
+#                    locations=st_coordinates(gb_2023_surv))
+#     
+#     if (startsWith(mw_models[model],"Off")){
+#       parameters<-list(b=3,
+#                        beta=20,
+#                        log_phi=-1,
+#                        log_epsilon=-1,
+#                        tow_eff=rep(0,length(unique(sub_mw$ID))))
+#       
+#       random<-c("tow_eff")
+#       
+#       if (grepl("Estimating",mw_models[model],fixed=T)) maps<-list() else maps<-list(b=factor(NA))
+#     } else if (startsWith(mw_models[model],"Insh")){
+#       parameters = list(
+#         beta = rep(0, nvar),
+#         beta_depth = rep(0, nvar),
+#         log_phi = log(0.1))
+#       
+#       maps <- list(
+#         # beta = factor(rep(NA, nvar)),
+#         # beta = factor(c(2,NA)),
+#         # beta = factor(c(NA,2)),
+#         # beta = factor(c(3,2)),
+#         beta_depth=factor(c(1,NA))
+#       )
+#       
+#       random<-c()
+#       
+#     } else if (grepl("Both",mw_models[model],fixed=T)) {
+#       parameters = list(
+#         beta = rep(0, nvar),
+#         beta_depth = rep(0, nvar),
+#         beta_s = rep(0,nrow(tmb_data$locations)),
+#         beta_b_s = rep(0,nrow(tmb_data$locations)),
+#         log_rho = log(10),
+#         log_sig = log(0.1),
+#         log_nu = log(1),
+#         log_rho_b = log(10),
+#         log_sig_b = log(0.1),
+#         log_nu_b = log(1),
+#         log_phi = log(0.1))
+#       
+#       maps <- list(
+#         # beta = factor(rep(NA, nvar)),
+#         # beta = factor(c(2,NA)),
+#         # beta = factor(c(NA,2)),
+#         # beta = factor(c(3,2)),
+#         beta_depth=factor(c(1,NA)),
+#         log_nu=factor(NA),
+#         log_nu_b=factor(NA)
+#       )
+#       
+#       random=c("beta_s","beta_b_s")
+#     } else {
+#       parameters = list(
+#         beta = rep(0, nvar),
+#         beta_depth = rep(0, nvar),
+#         beta_s = rep(0,nrow(tmb_data$locations)),
+#         log_rho = log(10),
+#         log_sig = log(0.1),
+#         log_nu = log(1),
+#         log_phi = log(0.1),
+#         log_epsilon = log(0.1))#,
+#       # tow_eff = rep(0,length(unique(sub_mw$ID))))
+#       
+#       maps <- list(
+#         # beta = factor(rep(NA, nvar)),
+#         # beta = factor(c(2,NA)),
+#         # beta = factor(c(NA,2)),
+#         # beta = factor(c(3,2)),
+#         beta_depth=factor(c(1,NA)),
+#         log_nu=factor(NA)
+#       )
+#       
+#       random<-c("beta_s")
+#     }
+#     
+#     weight_obj[[model]][[fold]] = MakeADFun(data=tmb_data,
+#                                             parameters=parameters,
+#                                             map=maps,
+#                                             random=random,
+#                                             DLL=tmb_models[model],
+#                                             silent = F)
+#     
+#     weight_Opt[[model]][[fold]]<-optimx::optimr(weight_obj[[model]][[fold]]$par,weight_obj[[model]][[fold]]$fn,weight_obj[[model]][[fold]]$gr,
+#                                                 control=list(maxit=100000,maxeval=100000),
+#                                                 method="nlminb")
+#     while (weight_Opt[[model]][[fold]]$message=="iteration limit reached without convergence (10)"){
+#       weight_obj[[model]][[fold]]$par<-weight_obj[[model]][[fold]]$env$last.par.best[-which(names(weight_obj[[model]][[fold]]$env$last.par.best)==random)]
+#       weight_Opt[[model]][[fold]]<-optimx::optimr(weight_obj[[model]][[fold]]$par,weight_obj[[model]][[fold]]$fn,weight_obj[[model]][[fold]]$gr,
+#                                                   control=list(maxit=100000,maxeval=100000),
+#                                                   method="nlminb")
+#     }
+#     
+#     weight_rep[[model]][[fold]]<-sdreport(weight_obj[[model]][[fold]],bias.correct=F)
+#     
+#     weight_Report[[model]][[fold]]<-weight_obj[[model]][[fold]]$report()
+#     
+#   }
+# }
 
-test_weights[[fold]]<-sub_mw[folds[[fold]],]
-pred_weights[[fold]]<-sub_mw[-folds[[fold]],]
-
-tmb_data<-list(weight=test_weights[[fold]]$wmw,
-               heights=test_weights[[fold]]$sh/100,
-               tow_id=as.integer(as.factor(test_weights[[fold]]$ID))-1,
-               weight=test_weights[[fold]]$wmw,
-               varmat=as.matrix(cbind(1, log(test_weights[[fold]]$sh/100))),
-               depth=test_weights[[fold]]$depth,
-               ind_loc=test_weights[[fold]]$id_loc2-1,
-               locations=st_coordinates(gb_2023_surv))
-
-    if (startsWith(mw_models[model],"Off")){
-      parameters<-list(b=3,
-                     beta=20,
-                     log_phi=-1,
-                     log_epsilon=-1,
-                     tow_eff=rep(0,length(unique(sub_mw$ID))))
-
-      random<-c("tow_eff")
-
-      if (grepl("Estimating",mw_models[model],fixed=T)) maps<-list() else maps<-list(b=factor(NA))
-    } else if (startsWith(mw_models[model],"Insh")){
-      parameters = list(
-        beta = rep(0, nvar),
-        beta_depth = rep(0, nvar),
-        log_phi = log(0.1))
-
-      maps <- list(
-        # beta = factor(rep(NA, nvar)),
-        # beta = factor(c(2,NA)),
-        beta = factor(c(NA,2)),
-        # beta = factor(c(3,2)),
-        beta_depth=factor(c(1,NA))
-      )
-
-      random<-c()
-
-    } else if (grepl("Both",mw_models[model],fixed=T)) {
-      parameters = list(
-        beta = rep(0, nvar),
-        beta_depth = rep(0, nvar),
-        beta_s = rep(0,nrow(tmb_data$locations)),
-        beta_b_s = rep(0,nrow(tmb_data$locations)),
-        log_rho = log(10),
-        log_sig = log(0.1),
-        log_nu = log(1),
-        log_rho_b = log(10),
-        log_sig_b = log(0.1),
-        log_nu_b = log(1),
-        log_phi = log(0.1))
-
-      maps <- list(
-        # beta = factor(rep(NA, nvar)),
-        # beta = factor(c(2,NA)),
-        beta = factor(c(NA,2)),
-        # beta = factor(c(3,2)),
-        beta_depth=factor(c(1,NA)),
-        log_nu=factor(NA),
-        log_nu_b=factor(NA)
-      )
-
-      random=c("beta_s","beta_b_s")
-    } else {
-    parameters = list(
-    beta = rep(0, nvar),
-    beta_depth = rep(0, nvar),
-    beta_s = rep(0,nrow(tmb_data$locations)),
-    log_rho = log(10),
-    log_sig = log(0.1),
-    log_nu = log(1),
-    log_phi = log(0.1),
-    log_epsilon = log(0.1))#,
-    # tow_eff = rep(0,length(unique(sub_mw$ID))))
-
-    maps <- list(
-      # beta = factor(rep(NA, nvar)),
-      # beta = factor(c(2,NA)),
-      beta = factor(c(NA,2)),
-      # beta = factor(c(3,2)),
-      beta_depth=factor(c(1,NA)),
-      log_nu=factor(NA)
-    )
-
-    random<-c("beta_s")
-    }
-
-  weight_obj[[model]][[fold]] = MakeADFun(data=tmb_data,
-                   parameters=parameters,
-                   map=maps,
-                   random=random,
-                   DLL=tmb_models[model],
-                   silent = F)
-
-  weight_Opt[[model]][[fold]]<-optimx::optimr(weight_obj[[model]][[fold]]$par,weight_obj[[model]][[fold]]$fn,weight_obj[[model]][[fold]]$gr,
-                       control=list(maxit=100000,maxeval=100000),
-                       method="nlminb")
-  while (weight_Opt[[model]][[fold]]$message=="iteration limit reached without convergence (10)"){
-    weight_obj[[model]][[fold]]$par<-weight_obj[[model]][[fold]]$env$last.par.best[-which(names(weight_obj[[model]][[fold]]$env$last.par.best)==random)]
-    weight_Opt[[model]][[fold]]<-optimx::optimr(weight_obj[[model]][[fold]]$par,weight_obj[[model]][[fold]]$fn,weight_obj[[model]][[fold]]$gr,
-                                                control=list(maxit=100000,maxeval=100000),
-                                                method="nlminb")
-  }
-
-  weight_rep[[model]][[fold]]<-sdreport(weight_obj[[model]][[fold]],bias.correct=F)
-
-  weight_Report[[model]][[fold]]<-weight_obj[[model]][[fold]]$report()
-
-  }
-}
-
-save(test_weights,pred_weights,weight_obj,weight_Opt,weight_rep,weight_Report,file="./LW_Work/weight_cv_output.RData")
+# save(test_weights,pred_weights,weight_obj,weight_Opt,weight_rep,weight_Report,file="weight_cv_output_new_form.RData")
+load("weight_cv_output_new_form.RData")
 
 weight_predictions<-list(off=list(),off_ln=list(),in_ln=list(),spat=list(),spat_off=list(),spat_both=list(),off_estim=list(),off_ln_estim=list(),in_tow_ln=list())
 
@@ -940,27 +941,27 @@ for (fold in 1:10){
     # weight_predictions[[model]][[fold]]$pred_weight<-rep(NA,nrow(weight_predictions[[model]][[fold]]))
     if (model==1) weight_predictions[[model]][[fold]]$pred_weight<-(summary(weight_rep[[model]][[fold]])[1,1]+weight_Report[[model]][[fold]]$tow_eff[as.integer(as.factor(pred_weights[[fold]]$ID))])*(weight_predictions[[model]][[fold]]$sh)^3
     if (model==2) weight_predictions[[model]][[fold]]$pred_weight<-exp(log((summary(weight_rep[[model]][[fold]])[1,1]+weight_Report[[model]][[fold]]$tow_eff[as.integer(as.factor(pred_weights[[fold]]$ID))])*(weight_predictions[[model]][[fold]]$sh)^3)-(exp(summary(weight_rep[[model]][[fold]])[2,1])^2)/2)
-    if (model==3) weight_predictions[[model]][[fold]]$pred_weight<-exp((summary(weight_rep[[model]][[fold]])[2,1]*log(weight_predictions[[model]][[fold]]$depth) + summary(weight_rep[[model]][[fold]])[1,1]*log(weight_predictions[[model]][[fold]]$sh))-(exp(summary(weight_rep[[model]][[fold]])[3,1])^2)/2)
-    if (model==4) weight_predictions[[model]][[fold]]$pred_weight<-exp((summary(weight_rep[[model]][[fold]])[4,1]*log(weight_predictions[[model]][[fold]]$depth) + weight_Report[[model]][[fold]]$beta_s[pred_weights[[fold]]$id_loc2] + summary(weight_rep[[model]][[fold]])[3,1]*log(weight_predictions[[model]][[fold]]$sh))-(exp(summary(weight_rep[[model]][[fold]])[5,1])^2)/2)
-    if (model==5) weight_predictions[[model]][[fold]]$pred_weight<-exp((summary(weight_rep[[model]][[fold]])[4,1]*log(weight_predictions[[model]][[fold]]$depth) + (summary(weight_rep[[model]][[fold]])[3,1] + weight_Report[[model]][[fold]]$beta_s[pred_weights[[fold]]$id_loc2])*log(weight_predictions[[model]][[fold]]$sh))-(exp(summary(weight_rep[[model]][[fold]])[5,1])^2)/2)
-    if (model==6) weight_predictions[[model]][[fold]]$pred_weight<-exp((summary(weight_rep[[model]][[fold]])[6,1]*log(weight_predictions[[model]][[fold]]$depth) + weight_Report[[model]][[fold]]$beta_s[pred_weights[[fold]]$id_loc2] +(summary(weight_rep[[model]][[fold]])[5,1]+weight_Report[[model]][[fold]]$beta_b_s[pred_weights[[fold]]$id_loc2])*log(weight_predictions[[model]][[fold]]$sh)))-(exp(summary(weight_rep[[model]][[fold]])[7,1])^2)/2
+    if (model==3) weight_predictions[[model]][[fold]]$pred_weight<-exp(summary(weight_rep[[model]][[fold]])[1,1]+(summary(weight_rep[[model]][[fold]])[3,1]*log(weight_predictions[[model]][[fold]]$depth) + summary(weight_rep[[model]][[fold]])[2,1]*log(weight_predictions[[model]][[fold]]$sh))-(exp(summary(weight_rep[[model]][[fold]])[4,1])^2)/2)
+    if (model==4) weight_predictions[[model]][[fold]]$pred_weight<-exp(summary(weight_rep[[model]][[fold]])[3,1]+(summary(weight_rep[[model]][[fold]])[5,1]*log(weight_predictions[[model]][[fold]]$depth) + weight_Report[[model]][[fold]]$beta_s[pred_weights[[fold]]$id_loc2] + summary(weight_rep[[model]][[fold]])[4,1]*log(weight_predictions[[model]][[fold]]$sh))-(exp(summary(weight_rep[[model]][[fold]])[6,1])^2)/2)
+    if (model==5) weight_predictions[[model]][[fold]]$pred_weight<-exp(summary(weight_rep[[model]][[fold]])[3,1]+(summary(weight_rep[[model]][[fold]])[5,1]*log(weight_predictions[[model]][[fold]]$depth) + (summary(weight_rep[[model]][[fold]])[4,1] + weight_Report[[model]][[fold]]$beta_s[pred_weights[[fold]]$id_loc2])*log(weight_predictions[[model]][[fold]]$sh))-(exp(summary(weight_rep[[model]][[fold]])[6,1])^2)/2)
+    if (model==6) weight_predictions[[model]][[fold]]$pred_weight<-exp(summary(weight_rep[[model]][[fold]])[5,1]+(summary(weight_rep[[model]][[fold]])[7,1]*log(weight_predictions[[model]][[fold]]$depth) + weight_Report[[model]][[fold]]$beta_s[pred_weights[[fold]]$id_loc2] +(summary(weight_rep[[model]][[fold]])[6,1]+weight_Report[[model]][[fold]]$beta_b_s[pred_weights[[fold]]$id_loc2])*log(weight_predictions[[model]][[fold]]$sh)))-(exp(summary(weight_rep[[model]][[fold]])[8,1])^2)/2
     if (model==7) weight_predictions[[model]][[fold]]$pred_weight<-(summary(weight_rep[[model]][[fold]])[2,1]+weight_Report[[model]][[fold]]$tow_eff[as.integer(as.factor(pred_weights[[fold]]$ID))])*(weight_predictions[[model]][[fold]]$sh)^summary(weight_rep[[model]][[fold]])[1,1]
     if (model==8) weight_predictions[[model]][[fold]]$pred_weight<-exp(log((summary(weight_rep[[model]][[fold]])[2,1]+weight_Report[[model]][[fold]]$tow_eff[as.integer(as.factor(pred_weights[[fold]]$ID))])*(weight_predictions[[model]][[fold]]$sh)^summary(weight_rep[[model]][[fold]])[1,1])-(exp(summary(weight_rep[[model]][[fold]])[3,1])^2)/2)
     if (model==9) weight_predictions[[model]][[fold]]$pred_weight<-exp((summary(weight_rep[[model]][[fold]])[2,1]*log(weight_predictions[[model]][[fold]]$depth) + summary(weight_rep[[model]][[fold]])[5:119,1][as.integer(as.factor(weight_predictions[[model]][[fold]]$ID))] + summary(weight_rep[[model]][[fold]])[1,1]*log(weight_predictions[[model]][[fold]]$sh))-(exp(summary(weight_rep[[model]][[fold]])[3,1])^2)/2)
     weight_predictions[[model]][[fold]]$squared_error<-(weight_predictions[[model]][[fold]]$wmw-weight_predictions[[model]][[fold]]$pred_weight)^2
-
+    
   }
 }
 
 mw_models[3]<-"Depth"
 
-all_pred_heights<-cbind(pred_heights[[1]],fold=rep(1,nrow(pred_heights[[1]])))
-for (fold in 2:10){
-  all_pred_heights<-rbind(all_pred_heights,cbind(pred_heights[[fold]],fold=rep(fold,nrow(pred_heights[[fold]]))))
-}
-
-all_pred_heights$geometry<-gb_2023_surv[all_pred_heights$tow_id,]$geometry
-all_pred_heights<-st_as_sf(all_pred_heights)
+# all_pred_heights<-cbind(pred_heights[[1]],fold=rep(1,nrow(pred_heights[[1]])))
+# for (fold in 2:10){
+#   all_pred_heights<-rbind(all_pred_heights,cbind(pred_heights[[fold]],fold=rep(fold,nrow(pred_heights[[fold]]))))
+# }
+# 
+# all_pred_heights$geometry<-gb_2023_surv[all_pred_heights$tow_id,]$geometry
+# all_pred_heights<-st_as_sf(all_pred_heights)
 
 for (model in 1:length(mw_models)){
   for (fold in 1:10){
@@ -981,11 +982,11 @@ library(forcats)
 all_pred_weights$model<-as.factor(all_pred_weights$model)
 all_pred_weights<-all_pred_weights %>% mutate(model=fct_relevel(model,mw_models))
 
-all_pred_heights$rsq_e<-sqrt(all_pred_heights$squared_error)/10
+# all_pred_heights$rsq_e<-sqrt(all_pred_heights$squared_error)/10
 all_pred_weights$rsq_e<-sqrt(all_pred_weights$squared_error)
-heights_overall_rmspe<-mean(all_pred_heights$rsq_e)
+# heights_overall_rmspe<-mean(all_pred_heights$rsq_e)
 weights_overall_rmspe<-aggregate(rsq_e~model,data=all_pred_weights,FUN=mean)
-heights_fold_rmspe<-aggregate(rsq_e~fold,data=all_pred_heights,FUN=mean)
+# heights_fold_rmspe<-aggregate(rsq_e~fold,data=all_pred_heights,FUN=mean)
 weights_fold_rmspe<-aggregate(rsq_e~fold+model,data=all_pred_weights,FUN=mean)
 weights_tow_rmspe<-aggregate(rsq_e~ID+model,data=all_pred_weights,FUN=mean)
 weights_tow_rmspe2<-aggregate(rsq_e~ID+model,data=all_pred_weights,FUN=length) %>% rename(n=rsq_e)
@@ -1019,51 +1020,51 @@ weight_tow_spat_rmspe_plot<-ggplot()+
   facet_wrap(~model)+
   theme_bw()
 
-heights_tow_rmspe<-aggregate(rsq_e~tow_id,data=all_pred_heights,FUN=mean)
-heights_tow_rmspe2<-aggregate(rsq_e~tow_id,data=all_pred_heights,FUN=length) %>% rename(n=rsq_e)
-heights_tow_rmspe<-cbind(heights_tow_rmspe,n=heights_tow_rmspe2$n)
-
-heights_tow_rmspe$geometry<-rep(NA,nrow(heights_tow_rmspe))
-for (i in 1:nrow(heights_tow_rmspe)){
-  heights_tow_rmspe$geometry[i]<-all_pred_heights$geometry[which(heights_tow_rmspe$tow_id[i]==all_pred_heights$tow_id)[1]]
-}
-heights_tow_rmspe<-st_as_sf(heights_tow_rmspe)
-
-height_tow_spat_rmspe_plot<-ggplot()+
-  geom_sf(data=heights_tow_rmspe,aes(col=rsq_e,size=n))+
-  scale_color_viridis_c(name="RMSPE")+
-  scale_size(name="Number of fully-recruited \nscallops caught")+
-  theme_bw()
+# heights_tow_rmspe<-aggregate(rsq_e~tow_id,data=all_pred_heights,FUN=mean)
+# heights_tow_rmspe2<-aggregate(rsq_e~tow_id,data=all_pred_heights,FUN=length) %>% rename(n=rsq_e)
+# heights_tow_rmspe<-cbind(heights_tow_rmspe,n=heights_tow_rmspe2$n)
+# 
+# heights_tow_rmspe$geometry<-rep(NA,nrow(heights_tow_rmspe))
+# for (i in 1:nrow(heights_tow_rmspe)){
+#   heights_tow_rmspe$geometry[i]<-all_pred_heights$geometry[which(heights_tow_rmspe$tow_id[i]==all_pred_heights$tow_id)[1]]
+# }
+# heights_tow_rmspe<-st_as_sf(heights_tow_rmspe)
+# 
+# height_tow_spat_rmspe_plot<-ggplot()+
+#   geom_sf(data=heights_tow_rmspe,aes(col=rsq_e,size=n))+
+#   scale_color_viridis_c(name="RMSPE")+
+#   scale_size(name="Number of fully-recruited \nscallops caught")+
+#   theme_bw()
 
 
 #Predicted mean heights per tow
-a_b_truncation=c(9.5,17)
-non_cor_sh_sf<-long_heights
-non_cor_sh_sf$geometry<-gb_2023_surv$geometry[long_heights$tow_id]
-non_cor_sh_sf<-st_as_sf(non_cor_sh_sf)
-# st_crs(non_cor_sh_sf)<-4326
-non_cor_sh_sf$mean_pred_height<-Report5$mu_sh+exp(summary(rep5)[5,1])*(dnorm(9.5,Report5$mu_sh,exp(summary(rep5)[5,1]))-dnorm(17,Report5$mu_sh,exp(summary(rep5)[5,1])))/(pnorm(17,Report5$mu_sh,exp(summary(rep5)[5,1]))-pnorm(9.5,Report5$mu_sh,exp(summary(rep5)[5,1])))
-non_cor_sh_sf<-non_cor_sh_sf[order(non_cor_sh_sf$tow_id),]
-
-sub_sh_sf<-non_cor_sh_sf[!duplicated(non_cor_sh_sf$tow_id),]
-sub_sh_sf$n<-aggregate(mean_pred_height~tow_id,data=st_drop_geometry(non_cor_sh_sf),FUN=length)$mean_pred_height
-
-spat_mean_pred_height<-ggplot()+
-  geom_sf(data=sub_sh_sf,aes(col=mean_pred_height,size=n))+
-  scale_color_viridis_c(name="Predicted Mean \nShell Height",
-                        limits=c(9.5,15.2))+
-  scale_size(name="Number of fully-recruited \nscallops caught")+
-  theme_bw()
+# a_b_truncation=c(9.5,17)
+# non_cor_sh_sf<-long_heights
+# non_cor_sh_sf$geometry<-gb_2023_surv$geometry[long_heights$tow_id]
+# non_cor_sh_sf<-st_as_sf(non_cor_sh_sf)
+# # st_crs(non_cor_sh_sf)<-4326
+# non_cor_sh_sf$mean_pred_height<-Report5$mu_sh+exp(summary(rep5)[5,1])*(dnorm(9.5,Report5$mu_sh,exp(summary(rep5)[5,1]))-dnorm(17,Report5$mu_sh,exp(summary(rep5)[5,1])))/(pnorm(17,Report5$mu_sh,exp(summary(rep5)[5,1]))-pnorm(9.5,Report5$mu_sh,exp(summary(rep5)[5,1])))
+# non_cor_sh_sf<-non_cor_sh_sf[order(non_cor_sh_sf$tow_id),]
+# 
+# sub_sh_sf<-non_cor_sh_sf[!duplicated(non_cor_sh_sf$tow_id),]
+# sub_sh_sf$n<-aggregate(mean_pred_height~tow_id,data=st_drop_geometry(non_cor_sh_sf),FUN=length)$mean_pred_height
+# 
+# spat_mean_pred_height<-ggplot()+
+#   geom_sf(data=sub_sh_sf,aes(col=mean_pred_height,size=n))+
+#   scale_color_viridis_c(name="Predicted Mean \nShell Height",
+#                         limits=c(9.5,15.2))+
+#   scale_size(name="Number of fully-recruited \nscallops caught")+
+#   theme_bw()
 
 # #Raw commercial size mean shell heights
-sub_sh_sf$mean_obs_height<-aggregate(heights~tow_id,data=st_drop_geometry(non_cor_sh_sf),FUN=mean)$heights
-
-spat_mean_obs_height<-ggplot()+
-  geom_sf(data=sub_sh_sf,aes(col=mean_obs_height/10,size=n))+
-  scale_color_viridis_c(name="Observed Mean \nShell Height",
-                        limits=c(9.5,15.2))+
-  scale_size(name="Number of fully-recruited \nscallops caught")+
-  theme_bw()
+# sub_sh_sf$mean_obs_height<-aggregate(heights~tow_id,data=st_drop_geometry(non_cor_sh_sf),FUN=mean)$heights
+# 
+# spat_mean_obs_height<-ggplot()+
+#   geom_sf(data=sub_sh_sf,aes(col=mean_obs_height/10,size=n))+
+#   scale_color_viridis_c(name="Observed Mean \nShell Height",
+#                         limits=c(9.5,15.2))+
+#   scale_size(name="Number of fully-recruited \nscallops caught")+
+#   theme_bw()
 
 #Doing leave-1-loc-out CV, since we have to predict in unsampled areas
 test_tcv_heights<-list()
@@ -1088,74 +1089,83 @@ parameters = list(
   log_upsilon = log(0.5))
 
 
-for (tow_fold in 1:length(unique(long_heights$tow_id))){
+# for (tow_fold in 1:length(unique(long_heights$tow_id))){
+#   
+#   test_tcv_heights[[tow_fold]]<-long_heights[-which(long_heights$tow_id==unique(long_heights$tow_id)[tow_fold]),]
+#   pred_tcv_heights[[tow_fold]]<-long_heights[which(long_heights$tow_id==unique(long_heights$tow_id)[tow_fold]),]
+#   
+#   tmb_data<-list(varmat_sh=as.matrix(cbind(rep(1,nrow(test_tcv_heights[[tow_fold]])))),
+#                  depth_sh=test_tcv_heights[[tow_fold]]$depth,
+#                  ind_loc_sh=test_tcv_heights[[tow_fold]]$tow_id-1,
+#                  locations=st_coordinates(gb_2023_surv),
+#                  s_heights=test_tcv_heights[[tow_fold]]$heights/10,
+#                  a_b_truncation=c(9.5,17))
+#   
+#   maps <- list(
+#     log_nu=c(factor(NA))#
+#   )
+#   
+#   tcv_height_obj[[tow_fold]] = MakeADFun(data=tmb_data,
+#                                          parameters=parameters,
+#                                          map=maps,
+#                                          random=c("beta_sh_s"),
+#                                          DLL="spatial_depth_glmm_height",
+#                                          silent = F)
+#   
+#   tcv_height_Opt[[tow_fold]]<-optimx::optimr(tcv_height_obj[[tow_fold]]$par,tcv_height_obj[[tow_fold]]$fn,tcv_height_obj[[tow_fold]]$gr,
+#                                              control=list(maxit=100000,maxeval=100000),
+#                                              method="nlminb")
+#   
+#   tcv_height_rep[[tow_fold]]<-sdreport(tcv_height_obj[[tow_fold]],bias.correct=F)
+#   
+#   tcv_height_Report[[tow_fold]]<-tcv_height_obj[[tow_fold]]$report()
+#   
+#   upsilon<-exp(tcv_height_rep[[tow_fold]]$value[which(names(tcv_height_rep[[tow_fold]]$value)=="log_upsilon")])
+#   mus<-(tcv_height_Report[[tow_fold]]$beta_sh + tcv_height_Report[[tow_fold]]$beta_sh_s[pred_tcv_heights[[tow_fold]]$tow_id]+tcv_height_Report[[tow_fold]]$beta_depth*pred_tcv_heights[[tow_fold]]$depth)
+#   
+#   pred_tcv_heights[[tow_fold]]$pred_height<-mus +(((dnorm(9.5,mus,upsilon))-(dnorm(17,mus,upsilon)))/(pnorm(17,mus,upsilon)-pnorm(9.5,mus,upsilon)))*upsilon
+#   pred_tcv_heights[[tow_fold]]$squared_error<-(pred_tcv_heights[[tow_fold]]$heights/10-pred_tcv_heights[[tow_fold]]$pred_height)^2
+#   
+# }
+# 
+# tot_height_tow_folds<-length(unique(long_heights$tow_id))
+# 
+# all_tow_pred_heights<-pred_tcv_heights[[1]]
+# for (i in 2:tot_height_tow_folds){
+#   all_tow_pred_heights<-rbind(all_tow_pred_heights,pred_tcv_heights[[i]])
+# }
+# 
+# tcv_height_rmspe<-sqrt(mean(all_tow_pred_heights$squared_error))/10
+# 
+# tcv_tow_height_rmspe<-aggregate(squared_error~tow_id,data=all_tow_pred_heights,FUN=mean)
+# 
+# tcv_tow_height_rmspe$geometry<-gb_2023_surv$geometry[tcv_tow_height_rmspe$tow_id]
+# tcv_tow_height_rmspe<-st_as_sf(tcv_tow_height_rmspe)
+# tcv_tow_height_rmspe$n<-aggregate(squared_error~tow_id,data=all_tow_pred_heights,FUN=length)$squared_error
+# 
+# tcv_height_tow_rmspe_plot<-ggplot()+
+#   geom_sf(data=tcv_tow_height_rmspe,aes(col=sqrt(squared_error),size=n))+
+#   scale_color_viridis_c(name="RMSPE")+
+#   scale_size(name="Number of scallops")+
+#   theme_bw()
+# 
+# tcv_height_tow_rel_rmspe_plot<-ggplot()+
+#   geom_sf(data=tcv_tow_height_rmspe,aes(col=sqrt(squared_error)/n),cex=2)+
+#   scale_color_viridis_c(name="RMSPE divided by n")+
+#   scale_size(name="Number of scallops")+
+#   theme_bw()
 
-  test_tcv_heights[[tow_fold]]<-long_heights[-which(long_heights$tow_id==unique(long_heights$tow_id)[tow_fold]),]
-  pred_tcv_heights[[tow_fold]]<-long_heights[which(long_heights$tow_id==unique(long_heights$tow_id)[tow_fold]),]
-
-  tmb_data<-list(varmat_sh=as.matrix(cbind(rep(1,nrow(test_tcv_heights[[tow_fold]])))),
-                 depth_sh=test_tcv_heights[[tow_fold]]$depth,
-                 ind_loc_sh=test_tcv_heights[[tow_fold]]$tow_id-1,
-                 locations=st_coordinates(gb_2023_surv),
-                 s_heights=test_tcv_heights[[tow_fold]]$heights/10,
-                 a_b_truncation=c(9.5,17))
-
-  maps <- list(
-    log_nu=c(factor(NA))#
-  )
-
-  tcv_height_obj[[tow_fold]] = MakeADFun(data=tmb_data,
-                   parameters=parameters,
-                   map=maps,
-                   random=c("beta_sh_s"),
-                   DLL="spatial_depth_glmm_height",
-                   silent = F)
-
-  tcv_height_Opt[[tow_fold]]<-optimx::optimr(tcv_height_obj[[tow_fold]]$par,tcv_height_obj[[tow_fold]]$fn,tcv_height_obj[[tow_fold]]$gr,
-                       control=list(maxit=100000,maxeval=100000),
-                       method="nlminb")
-
-  tcv_height_rep[[tow_fold]]<-sdreport(tcv_height_obj[[tow_fold]],bias.correct=F)
-
-  tcv_height_Report[[tow_fold]]<-tcv_height_obj[[tow_fold]]$report()
-
-  upsilon<-exp(tcv_height_rep[[tow_fold]]$value[which(names(tcv_height_rep[[tow_fold]]$value)=="log_upsilon")])
-  mus<-(tcv_height_Report[[tow_fold]]$beta_sh + tcv_height_Report[[tow_fold]]$beta_sh_s[pred_tcv_heights[[tow_fold]]$tow_id]+tcv_height_Report[[tow_fold]]$beta_depth*pred_tcv_heights[[tow_fold]]$depth)
-
-  pred_tcv_heights[[tow_fold]]$pred_height<-mus +(((dnorm(9.5,mus,upsilon))-(dnorm(17,mus,upsilon)))/(pnorm(17,mus,upsilon)-pnorm(9.5,mus,upsilon)))*upsilon
-  pred_tcv_heights[[tow_fold]]$squared_error<-(pred_tcv_heights[[tow_fold]]$heights/10-pred_tcv_heights[[tow_fold]]$pred_height)^2
-
-}
-
-tot_height_tow_folds<-length(unique(long_heights$tow_id))
-
-all_tow_pred_heights<-pred_tcv_heights[[1]]
-for (i in 2:tot_height_tow_folds){
-  all_tow_pred_heights<-rbind(all_tow_pred_heights,pred_tcv_heights[[i]])
-}
-
-tcv_height_rmspe<-sqrt(mean(all_tow_pred_heights$squared_error))/10
-
-tcv_tow_height_rmspe<-aggregate(squared_error~tow_id,data=all_tow_pred_heights,FUN=mean)
-
-tcv_tow_height_rmspe$geometry<-gb_2023_surv$geometry[tcv_tow_height_rmspe$tow_id]
-tcv_tow_height_rmspe<-st_as_sf(tcv_tow_height_rmspe)
-tcv_tow_height_rmspe$n<-aggregate(squared_error~tow_id,data=all_tow_pred_heights,FUN=length)$squared_error
-
-tcv_height_tow_rmspe_plot<-ggplot()+
-  geom_sf(data=tcv_tow_height_rmspe,aes(col=sqrt(squared_error),size=n))+
-  scale_color_viridis_c(name="RMSPE")+
-  scale_size(name="Number of scallops")+
-  theme_bw()
-
-tcv_height_tow_rel_rmspe_plot<-ggplot()+
-  geom_sf(data=tcv_tow_height_rmspe,aes(col=sqrt(squared_error)/n),cex=2)+
-  scale_color_viridis_c(name="RMSPE divided by n")+
-  scale_size(name="Number of scallops")+
-  theme_bw()
+mw_models<-c(mw_names[c(1,3,5:6,8,9)],
+             "Offshore Estimating b",
+             "Offshore LN Estimating")#,
+#"Inshore Depth Tow LN GLMM")
+mw_models[3]<-"Inshore Depth LN LMM"
 
 tmb_models2<-tmb_models
 tmb_models2[6]<-"spat_both_less_adreport"
+
+compile("spat_both_less_adreport.cpp")
+dyn.load(dynlib("spat_both_less_adreport"))
 
 set.seed(1823)
 test_tcv_weights<-list()
@@ -1168,194 +1178,222 @@ tcv_weight_MSPE<-list(off=list(),off_ln=list(),in_ln=list(),spat=list(),spat_off
 tcv_gam_fit<-list(off=list(),off_ln=list(),in_ln=list(),spat=list(),spat_off=list(),spat_both=list(),off_estim=list(),off_ln_estim=list())
 tcv_gam_pred<-list(off=list(),off_ln=list(),in_ln=list(),spat=list(),spat_off=list(),spat_both=list(),off_estim=list(),off_ln_estim=list())
 
-load("./LW_Work/tcv_weight_output.RData")
-
-for (tow_fold in 63:length(unique(sub_mw$ID))){
-for (tow_fold in 56){
-  for (model in 6:length(mw_models)){
-
-    test_tcv_weights[[tow_fold]]<-sub_mw[-which(sub_mw$ID==unique(sub_mw$ID)[tow_fold]),]
-    pred_tcv_weights[[tow_fold]]<-sub_mw[which(sub_mw$ID==unique(sub_mw$ID)[tow_fold]),]
-
-    tmb_data<-list(weight=test_tcv_weights[[tow_fold]]$wmw,
-                   heights=test_tcv_weights[[tow_fold]]$sh/100,
-                   tow_id=as.integer(as.factor(test_tcv_weights[[tow_fold]]$ID))-1,
-                   weight=test_tcv_weights[[tow_fold]]$wmw,
-                   varmat=as.matrix(cbind(1, log(test_tcv_weights[[tow_fold]]$sh/100))),
-                   depth=test_tcv_weights[[tow_fold]]$depth,
-                   ind_loc=test_tcv_weights[[tow_fold]]$id_loc2-1,
-                   locations=st_coordinates(gb_2023_surv))
-
-    if (startsWith(mw_models[model],"Off")){
-      parameters<-list(b=3,
-                       beta=20,
-                       log_phi=-1,
-                       log_epsilon=-1,
-                       tow_eff=rep(0,length(unique(sub_mw$ID))-1))
-
-      random<-c("tow_eff")
-
-      if (grepl("Estimating",mw_models[model],fixed=T)) maps<-list() else maps<-list(b=factor(NA))
-    } else if (startsWith(mw_models[model],"Insh")){
-      parameters = list(
-        beta = rep(0, nvar),
-        beta_depth = rep(0, nvar),
-        log_phi = log(0.1))
-
-      maps <- list(
-        # beta = factor(rep(NA, nvar)),
-        # beta = factor(c(2,NA)),
-        beta = factor(c(NA,2)),
-        # beta = factor(c(3,2)),
-        beta_depth=factor(c(1,NA))
-      )
-
-      random<-c()
-
-    } else if (grepl("Both",mw_models[model],fixed=T)) {
-      parameters = list(
-        beta = rep(0, nvar),
-        beta_depth = rep(0, nvar),
-        beta_s = rep(0,nrow(tmb_data$locations)),
-        beta_b_s = rep(0,nrow(tmb_data$locations)),
-        log_rho = log(10),
-        log_sig = log(0.1),
-        log_nu = log(1),
-        log_rho_b = log(10),
-        log_sig_b = log(0.1),
-        log_nu_b = log(1),
-        log_phi = log(0.1))
-
-      maps <- list(
-        # beta = factor(rep(NA, nvar)),
-        # beta = factor(c(2,NA)),
-        beta = factor(c(NA,2)),
-        # beta = factor(c(3,2)),
-        beta_depth=factor(c(1,NA)),
-        log_nu=factor(NA),
-        log_nu_b=factor(NA)
-      )
-
-      random=c("beta_s","beta_b_s")
-    } else {
-      parameters = list(
-        beta = rep(0, nvar),
-        beta_depth = rep(0, nvar),
-        beta_s = rep(0,nrow(tmb_data$locations)),
-        log_rho = log(10),
-        log_sig = log(0.1),
-        log_nu = log(1),
-        log_phi = log(0.1),
-        log_epsilon = log(0.1))#,
-      # tow_eff = rep(0,length(unique(sub_mw$ID))))
-
-      maps <- list(
-        # beta = factor(rep(NA, nvar)),
-        # beta = factor(c(2,NA)),
-        beta = factor(c(NA,2)),
-        # beta = factor(c(3,2)),
-        beta_depth=factor(c(1,NA)),
-        log_nu=factor(NA)
-      )
-
-      random<-c("beta_s")
-    }
-
-    tcv_weight_obj[[model]][[tow_fold]] = MakeADFun(data=tmb_data,
-                     parameters=parameters,
-                     map=maps,
-                     random=random,
-                     DLL=tmb_models2[model],
-                     silent = F)
-
-    tcv_weight_Opt[[model]][[tow_fold]]<-optimx::optimr(tcv_weight_obj[[model]][[tow_fold]]$par,tcv_weight_obj[[model]][[tow_fold]]$fn,tcv_weight_obj[[model]][[tow_fold]]$gr,
-                         control=list(maxit=100000,maxeval=100000),
-                         method="nlminb")
-    while (tcv_weight_Opt[[model]][[tow_fold]]$message=="iteration limit reached without convergence (10)"){
-      tcv_weight_obj[[model]][[tow_fold]]$par<-tcv_weight_obj[[model]][[tow_fold]]$env$last.par.best[-which(names(tcv_weight_obj[[model]][[tow_fold]]$env$last.par.best)==random)]
-      tcv_weight_Opt[[model]][[tow_fold]]<-optimx::optimr(tcv_weight_obj[[model]][[tow_fold]]$par,tcv_weight_obj[[model]][[tow_fold]]$fn,tcv_weight_obj[[model]][[tow_fold]]$gr,
-                                                  control=list(maxit=100000,maxeval=100000),
-                                                  method="nlminb")
-    }
-
-    tcv_weight_rep[[model]][[tow_fold]]<-sdreport(tcv_weight_obj[[model]][[tow_fold]],bias.correct=F)
-
-    tcv_weight_Report[[model]][[tow_fold]]<-tcv_weight_obj[[model]][[tow_fold]]$report()
-
-    if (startsWith(mw_models[model],"Off")) {
-      temp_fit<-data.frame(ID=unique(sub_mw$ID)[-tow_fold],CF=(tcv_weight_Report[[model]][[tow_fold]]$beta+tcv_weight_Report[[model]][[tow_fold]]$tow_eff))
-
-      CF.data<-merge(sub_mw[-which(sub_mw$ID==unique(sub_mw$ID)[tow_fold]),][!duplicated(sub_mw$ID),c('ID','lon','lat','year','depth','tow')],temp_fit)
-
-      names(CF.data)<-c('ID','lon','lat','year','depth','tow','CF')
-
-      tcv_gam_fit[[model]][[tow_fold]]<-gam(CF~s(lon,lat)+s(depth),data=CF.data)
-
-      Cf.pred<-data.frame(depth=unique(pred_tcv_weights[[tow_fold]]$depth),lon=unique(pred_tcv_weights[[tow_fold]]$lon),lat=unique(pred_tcv_weights[[tow_fold]]$lat))
-      tcv_gam_pred[[model]][[tow_fold]]<-predict(tcv_gam_fit[[model]][[tow_fold]],Cf.pred, se=T)$fit
-    }
-
-  }
-}
-
-county<-1
-for (i in 1:5){
-  temp_test_tcv_weights<-list()
-  temp_pred_tcv_weights<-list()
-  temp_tcv_weight_obj<-list(list(),list(),list(),list(),list(),list(),list(),list())
-  temp_tcv_weight_Opt<-list(list(),list(),list(),list(),list(),list(),list(),list())
-  temp_tcv_weight_rep<-list(list(),list(),list(),list(),list(),list(),list(),list())
-  temp_tcv_weight_Report<-list(list(),list(),list(),list(),list(),list(),list(),list())
-  temp_tcv_gam_fit<-list(list(),list(),list(),list(),list(),list(),list(),list())
-  temp_tcv_gam_pred<-list(list(),list(),list(),list(),list(),list(),list(),list())
-  blep<-7
-  if (i==5) blep<-13
-for (j in 1:blep){
-  temp_test_tcv_weights[[j]]<-test_tcv_weights[[j+county]]
-  temp_pred_tcv_weights[[j]]<-pred_tcv_weights[[j+county]]
-  for (model in 1:8){
-    temp_tcv_weight_obj[[model]][[j]]<-tcv_weight_obj[[model]][[j+county]]
-    temp_tcv_weight_Opt[[model]][[j]]<-tcv_weight_Opt[[model]][[j+county]]
-    temp_tcv_weight_rep[[model]][[j]]<-tcv_weight_rep[[model]][[j+county]]
-    temp_tcv_weight_Report[[model]][[j]]<-tcv_weight_Report[[model]][[j+county]]
-    if (model %in% c(1,2,7,8)){
-      temp_tcv_gam_fit[[model]][[j]]<-tcv_gam_fit[[model]][[j+county]]
-      temp_tcv_gam_pred[[model]][[j]]<-tcv_gam_pred[[model]][[j+county]]
-    }
-  }
-}
-save(temp_test_tcv_weights,temp_pred_tcv_weights,temp_tcv_weight_obj,
-     temp_tcv_weight_Opt,temp_tcv_weight_rep,temp_tcv_weight_Report,
-     temp_tcv_gam_fit,temp_tcv_gam_pred,
-     # file=paste0("./LW_Work/tcv_weight_output",i+2,".RData"))
-     file="./LW_Work/tcv_weight_output2.RData")
-  county<-county+10
-}
-
+# county<-1
 # for (tow_fold in 1:length(unique(sub_mw$ID))){
-for (tow_fold in 103:115){
+#   if (tow_fold %in% c(seq(11,111,by=10))){
+#     tcv_weight_obj<-list(off=list(),off_ln=list(),in_ln=list(),spat=list(),spat_off=list(),spat_both=list(),off_estim=list(),off_ln_estim=list())
+#     tcv_weight_Opt<-list(off=list(),off_ln=list(),in_ln=list(),spat=list(),spat_off=list(),spat_both=list(),off_estim=list(),off_ln_estim=list())
+#     tcv_weight_rep<-list(off=list(),off_ln=list(),in_ln=list(),spat=list(),spat_off=list(),spat_both=list(),off_estim=list(),off_ln_estim=list())
+#     tcv_weight_Report<-list(off=list(),off_ln=list(),in_ln=list(),spat=list(),spat_off=list(),spat_both=list(),off_estim=list(),off_ln_estim=list())
+#     tcv_weight_MSPE<-list(off=list(),off_ln=list(),in_ln=list(),spat=list(),spat_off=list(),spat_both=list(),off_estim=list(),off_ln_estim=list())
+#     tcv_gam_fit<-list(off=list(),off_ln=list(),in_ln=list(),spat=list(),spat_off=list(),spat_both=list(),off_estim=list(),off_ln_estim=list())
+#     tcv_gam_pred<-list(off=list(),off_ln=list(),in_ln=list(),spat=list(),spat_off=list(),spat_both=list(),off_estim=list(),off_ln_estim=list())
+#   }
+#   for (model in 1:length(mw_models)){
+# 
+#     test_tcv_weights[[tow_fold]]<-sub_mw[-which(sub_mw$ID==unique(sub_mw$ID)[tow_fold]),]
+#     pred_tcv_weights[[tow_fold]]<-sub_mw[which(sub_mw$ID==unique(sub_mw$ID)[tow_fold]),]
+# 
+#     tmb_data<-list(weight=test_tcv_weights[[tow_fold]]$wmw,
+#                    heights=test_tcv_weights[[tow_fold]]$sh/100,
+#                    tow_id=as.integer(as.factor(test_tcv_weights[[tow_fold]]$ID))-1,
+#                    weight=test_tcv_weights[[tow_fold]]$wmw,
+#                    varmat=as.matrix(cbind(1, log(test_tcv_weights[[tow_fold]]$sh/100))),
+#                    depth=test_tcv_weights[[tow_fold]]$depth,
+#                    ind_loc=test_tcv_weights[[tow_fold]]$id_loc2-1,
+#                    locations=st_coordinates(gb_2023_surv))
+# 
+#     if (startsWith(mw_models[model],"Off")){
+#       parameters<-list(b=3,
+#                        beta=20,
+#                        log_phi=-1,
+#                        log_epsilon=-1,
+#                        tow_eff=rep(0,length(unique(sub_mw$ID))-1))
+# 
+#       random<-c("tow_eff")
+# 
+#       if (grepl("Estimating",mw_models[model],fixed=T)) maps<-list() else maps<-list(b=factor(NA))
+#     } else if (startsWith(mw_models[model],"Insh")){
+#       parameters = list(
+#         beta = rep(0, nvar),
+#         beta_depth = rep(0, nvar),
+#         log_phi = log(0.1))
+# 
+#       maps <- list(
+#         # beta = factor(rep(NA, nvar)),
+#         # beta = factor(c(2,NA)),
+#         # beta = factor(c(NA,2)),
+#         # beta = factor(c(3,2)),
+#         beta_depth=factor(c(1,NA))
+#       )
+# 
+#       random<-c()
+# 
+#     } else if (grepl("Both",mw_models[model],fixed=T)) {
+#       parameters = list(
+#         beta = rep(0, nvar),
+#         beta_depth = rep(0, nvar),
+#         beta_s = rep(0,nrow(tmb_data$locations)),
+#         beta_b_s = rep(0,nrow(tmb_data$locations)),
+#         log_rho = log(10),
+#         log_sig = log(0.1),
+#         log_nu = log(1),
+#         log_rho_b = log(10),
+#         log_sig_b = log(0.1),
+#         log_nu_b = log(1),
+#         log_phi = log(0.1))
+# 
+#       maps <- list(
+#         # beta = factor(rep(NA, nvar)),
+#         # beta = factor(c(2,NA)),
+#         # beta = factor(c(NA,2)),
+#         # beta = factor(c(3,2)),
+#         beta_depth=factor(c(1,NA)),
+#         log_nu=factor(NA),
+#         log_nu_b=factor(NA)
+#       )
+# 
+#       random=c("beta_s","beta_b_s")
+#     } else {
+#       parameters = list(
+#         beta = rep(0, nvar),
+#         beta_depth = rep(0, nvar),
+#         beta_s = rep(0,nrow(tmb_data$locations)),
+#         log_rho = log(10),
+#         log_sig = log(0.1),
+#         log_nu = log(1),
+#         log_phi = log(0.1),
+#         log_epsilon = log(0.1))#,
+#       # tow_eff = rep(0,length(unique(sub_mw$ID))))
+# 
+#       maps <- list(
+#         # beta = factor(rep(NA, nvar)),
+#         # beta = factor(c(2,NA)),
+#         # beta = factor(c(NA,2)),
+#         # beta = factor(c(3,2)),
+#         beta_depth=factor(c(1,NA)),
+#         log_nu=factor(NA)
+#       )
+# 
+#       random<-c("beta_s")
+#     }
+# 
+#     tcv_weight_obj[[model]][[county]] = MakeADFun(data=tmb_data,
+#                                                     parameters=parameters,
+#                                                     map=maps,
+#                                                     random=random,
+#                                                     DLL=tmb_models2[model],
+#                                                     silent = F)
+# 
+#     tcv_weight_Opt[[model]][[county]]<-optimx::optimr(tcv_weight_obj[[model]][[county]]$par,tcv_weight_obj[[model]][[county]]$fn,tcv_weight_obj[[model]][[county]]$gr,
+#                                                         control=list(maxit=100000,maxeval=100000),
+#                                                         method="nlminb")
+#     while (tcv_weight_Opt[[model]][[county]]$message=="iteration limit reached without convergence (10)"){
+#       tcv_weight_obj[[model]][[tow_fold]]$par<-tcv_weight_obj[[model]][[county]]$env$last.par.best[-which(names(tcv_weight_obj[[model]][[county]]$env$last.par.best)==random)]
+#       tcv_weight_Opt[[model]][[tow_fold]]<-optimx::optimr(tcv_weight_obj[[model]][[county]]$par,tcv_weight_obj[[model]][[county]]$fn,tcv_weight_obj[[model]][[county]]$gr,
+#                                                           control=list(maxit=100000,maxeval=100000),
+#                                                           method="nlminb")
+#     }
+# 
+#     tcv_weight_rep[[model]][[county]]<-sdreport(tcv_weight_obj[[model]][[county]],bias.correct=F)
+# 
+#     tcv_weight_Report[[model]][[county]]<-tcv_weight_obj[[model]][[county]]$report()
+# 
+#     if (startsWith(mw_models[model],"Off")) {
+#       temp_fit<-data.frame(ID=unique(sub_mw$ID)[-tow_fold],CF=(tcv_weight_Report[[model]][[county]]$beta+tcv_weight_Report[[model]][[county]]$tow_eff))
+# 
+#       CF.data<-merge(sub_mw[-which(sub_mw$ID==unique(sub_mw$ID)[tow_fold]),][!duplicated(sub_mw$ID),c('ID','lon','lat','year','depth','tow')],temp_fit)
+# 
+#       names(CF.data)<-c('ID','lon','lat','year','depth','tow','CF')
+# 
+#       tcv_gam_fit[[model]][[county]]<-gam(CF~s(lon,lat)+s(depth),data=CF.data)
+# 
+#       Cf.pred<-data.frame(depth=unique(pred_tcv_weights[[county]]$depth),lon=unique(pred_tcv_weights[[tow_fold]]$lon),lat=unique(pred_tcv_weights[[tow_fold]]$lat))
+#       tcv_gam_pred[[model]][[county]]<-predict(tcv_gam_fit[[model]][[county]],Cf.pred, se=T)$fit
+#     }
+# 
+#   }
+#   county<-county+1
+#   if (tow_fold %in% c(seq(10,110,by=10),115)){
+#     county<-1
+#     save(tcv_gam_pred,tcv_weight_rep,tcv_weight_Report,file=paste0("tcv_weight_output_newform_",tow_fold,".RData"))
+#   }
+# }
+# 
+# save(pred_tcv_weights,file="tcv_preds.RData")
+load("tcv_preds.RData")
+
+temp_tcv_weight_obj<-list(off=list(),off_ln=list(),in_ln=list(),spat=list(),spat_off=list(),spat_both=list(),off_estim=list(),off_ln_estim=list())
+temp_tcv_weight_Opt<-list(off=list(),off_ln=list(),in_ln=list(),spat=list(),spat_off=list(),spat_both=list(),off_estim=list(),off_ln_estim=list())
+temp_tcv_weight_rep<-list(off=list(),off_ln=list(),in_ln=list(),spat=list(),spat_off=list(),spat_both=list(),off_estim=list(),off_ln_estim=list())
+temp_tcv_weight_Report<-list(off=list(),off_ln=list(),in_ln=list(),spat=list(),spat_off=list(),spat_both=list(),off_estim=list(),off_ln_estim=list())
+temp_tcv_weight_MSPE<-list(off=list(),off_ln=list(),in_ln=list(),spat=list(),spat_off=list(),spat_both=list(),off_estim=list(),off_ln_estim=list())
+temp_tcv_gam_fit<-list(off=list(),off_ln=list(),in_ln=list(),spat=list(),spat_off=list(),spat_both=list(),off_estim=list(),off_ln_estim=list())
+temp_tcv_gam_pred<-list(off=list(),off_ln=list(),in_ln=list(),spat=list(),spat_off=list(),spat_both=list(),off_estim=list(),off_ln_estim=list())
+
+# counter<-1
+# for (i in c(seq(10,60,by=10))){
+counter<-61
+for (i in c(seq(70,110,by=10),115)){
+  load(paste0("tcv_weight_output_newform_",i,".RData"))
+  for (model in 1:8){
+    if (i==115){
+      for (blep in 1:5){
+        if (model %in% c(1,2,7,8)) temp_tcv_gam_pred[[model]][[counter-1+blep]]<-tcv_gam_pred[[model]][[blep]]
+        temp_tcv_weight_rep[[model]][[counter-1+blep]]<-tcv_weight_rep[[model]][[blep]]
+        temp_tcv_weight_Report[[model]][[counter-1+blep]]<-tcv_weight_Report[[model]][[blep]]
+      }
+    } else {
+      for (blep in 1:10){
+        if (model %in% c(1,2,7,8)) temp_tcv_gam_pred[[model]][[counter-1+blep]]<-tcv_gam_pred[[model]][[blep]]
+        temp_tcv_weight_rep[[model]][[counter-1+blep]]<-tcv_weight_rep[[model]][[blep]]
+        temp_tcv_weight_Report[[model]][[counter-1+blep]]<-tcv_weight_Report[[model]][[blep]]
+      }
+    }
+  }
+  counter<-counter+10
+}
+tcv_gam_pred<-temp_tcv_gam_pred
+tcv_weight_rep<-temp_tcv_weight_rep
+tcv_weight_Report<-temp_tcv_weight_Report
+rm(temp_tcv_gam_pred,temp_tcv_weight_rep,temp_tcv_weight_Report)
+
+tcv_weight_predictions<-list(off=list(),off_ln=list(),in_ln=list(),spat=list(),spat_off=list(),spat_both=list(),off_estim=list(),off_ln_estim=list(),in_tow_ln=list())
+
+# for (tow_fold in 1:60){
+for (tow_fold in 61:115){
+# for (tow_fold in 103:115){
   for (model in 1:length(mw_models)){
     tcv_weight_predictions[[model]][[tow_fold]]<-pred_tcv_weights[[tow_fold]]
     tcv_weight_predictions[[model]][[tow_fold]]$sh<-tcv_weight_predictions[[model]][[tow_fold]]$sh/100
     if (model==1) tcv_weight_predictions[[model]][[tow_fold]]$pred_weight<-rep(tcv_gam_pred[[model]][[tow_fold]],nrow(tcv_weight_predictions[[model]][[tow_fold]]))*(tcv_weight_predictions[[model]][[tow_fold]]$sh)^3
     if (model==2) tcv_weight_predictions[[model]][[tow_fold]]$pred_weight<-exp(log((rep(tcv_gam_pred[[model]][[tow_fold]],nrow(tcv_weight_predictions[[model]][[tow_fold]])))*(tcv_weight_predictions[[model]][[tow_fold]]$sh)^3)-(exp(summary(tcv_weight_rep[[model]][[tow_fold]])[2,1])^2)/2)
-    if (model==3) tcv_weight_predictions[[model]][[tow_fold]]$pred_weight<-exp((summary(tcv_weight_rep[[model]][[tow_fold]])[2,1]*log(tcv_weight_predictions[[model]][[tow_fold]]$depth) + summary(tcv_weight_rep[[model]][[tow_fold]])[1,1]*log(tcv_weight_predictions[[model]][[tow_fold]]$sh))-(exp(summary(tcv_weight_rep[[model]][[tow_fold]])[3,1])^2)/2)
-    if (model==4) tcv_weight_predictions[[model]][[tow_fold]]$pred_weight<-exp((summary(tcv_weight_rep[[model]][[tow_fold]])[4,1]*log(tcv_weight_predictions[[model]][[tow_fold]]$depth) + tcv_weight_Report[[model]][[tow_fold]]$beta_s[pred_tcv_weights[[tow_fold]]$id_loc2] + summary(tcv_weight_rep[[model]][[tow_fold]])[3,1]*log(tcv_weight_predictions[[model]][[tow_fold]]$sh))-(exp(summary(tcv_weight_rep[[model]][[tow_fold]])[5,1])^2)/2)
-    if (model==5) tcv_weight_predictions[[model]][[tow_fold]]$pred_weight<-exp((summary(tcv_weight_rep[[model]][[tow_fold]])[4,1]*log(tcv_weight_predictions[[model]][[tow_fold]]$depth) + (summary(tcv_weight_rep[[model]][[tow_fold]])[3,1]+ tcv_weight_Report[[model]][[tow_fold]]$beta_s[pred_tcv_weights[[tow_fold]]$id_loc2])*log(tcv_weight_predictions[[model]][[tow_fold]]$sh))-(exp(summary(tcv_weight_rep[[model]][[tow_fold]])[5,1])^2)/2)
-    if (model==6) tcv_weight_predictions[[model]][[tow_fold]]$pred_weight<-exp((summary(tcv_weight_rep[[model]][[tow_fold]])[6,1]*log(tcv_weight_predictions[[model]][[tow_fold]]$depth) + tcv_weight_Report[[model]][[tow_fold]]$beta_s[pred_tcv_weights[[tow_fold]]$id_loc2] +(summary(tcv_weight_rep[[model]][[tow_fold]])[5,1]+tcv_weight_Report[[model]][[tow_fold]]$beta_b_s[pred_tcv_weights[[tow_fold]]$id_loc2])*log(tcv_weight_predictions[[model]][[tow_fold]]$sh)))-(exp(summary(tcv_weight_rep[[model]][[tow_fold]])[7,1])^2)/2
+    if (model==3) tcv_weight_predictions[[model]][[tow_fold]]$pred_weight<-exp(summary(tcv_weight_rep[[model]][[tow_fold]])[1,1]+(summary(tcv_weight_rep[[model]][[tow_fold]])[3,1]*log(tcv_weight_predictions[[model]][[tow_fold]]$depth) + summary(tcv_weight_rep[[model]][[tow_fold]])[2,1]*log(tcv_weight_predictions[[model]][[tow_fold]]$sh))-(exp(summary(tcv_weight_rep[[model]][[tow_fold]])[4,1])^2)/2)
+    if (model==4) tcv_weight_predictions[[model]][[tow_fold]]$pred_weight<-exp((summary(tcv_weight_rep[[model]][[tow_fold]])[3,1]+summary(tcv_weight_rep[[model]][[tow_fold]])[5,1]*log(tcv_weight_predictions[[model]][[tow_fold]]$depth) + tcv_weight_Report[[model]][[tow_fold]]$beta_s[pred_tcv_weights[[tow_fold]]$id_loc2] + summary(tcv_weight_rep[[model]][[tow_fold]])[4,1]*log(tcv_weight_predictions[[model]][[tow_fold]]$sh))-(exp(summary(tcv_weight_rep[[model]][[tow_fold]])[6,1])^2)/2)
+    if (model==5) tcv_weight_predictions[[model]][[tow_fold]]$pred_weight<-exp((summary(tcv_weight_rep[[model]][[tow_fold]])[3,1]+summary(tcv_weight_rep[[model]][[tow_fold]])[5,1]*log(tcv_weight_predictions[[model]][[tow_fold]]$depth) + (summary(tcv_weight_rep[[model]][[tow_fold]])[4,1]+ tcv_weight_Report[[model]][[tow_fold]]$beta_s[pred_tcv_weights[[tow_fold]]$id_loc2])*log(tcv_weight_predictions[[model]][[tow_fold]]$sh))-(exp(summary(tcv_weight_rep[[model]][[tow_fold]])[6,1])^2)/2)
+    if (model==6) tcv_weight_predictions[[model]][[tow_fold]]$pred_weight<-exp((summary(tcv_weight_rep[[model]][[tow_fold]])[5,1]+summary(tcv_weight_rep[[model]][[tow_fold]])[7,1]*log(tcv_weight_predictions[[model]][[tow_fold]]$depth) + tcv_weight_Report[[model]][[tow_fold]]$beta_s[pred_tcv_weights[[tow_fold]]$id_loc2] +(summary(tcv_weight_rep[[model]][[tow_fold]])[6,1]+tcv_weight_Report[[model]][[tow_fold]]$beta_b_s[pred_tcv_weights[[tow_fold]]$id_loc2])*log(tcv_weight_predictions[[model]][[tow_fold]]$sh)))-(exp(summary(tcv_weight_rep[[model]][[tow_fold]])[8,1])^2)/2
     if (model==7) tcv_weight_predictions[[model]][[tow_fold]]$pred_weight<-(rep(tcv_gam_pred[[model]][[tow_fold]],nrow(tcv_weight_predictions[[model]][[tow_fold]])))*(tcv_weight_predictions[[model]][[tow_fold]]$sh)^summary(tcv_weight_rep[[model]][[tow_fold]])[1,1]
     if (model==8) tcv_weight_predictions[[model]][[tow_fold]]$pred_weight<-exp(log((rep(tcv_gam_pred[[model]][[tow_fold]],nrow(tcv_weight_predictions[[model]][[tow_fold]])))*(tcv_weight_predictions[[model]][[tow_fold]]$sh)^summary(tcv_weight_rep[[model]][[tow_fold]])[1,1])-(exp(summary(tcv_weight_rep[[model]][[tow_fold]])[3,1])^2)/2)
     tcv_weight_predictions[[model]][[tow_fold]]$squared_error<-(tcv_weight_predictions[[model]][[tow_fold]]$wmw-tcv_weight_predictions[[model]][[tow_fold]]$pred_weight)^2
 
   }
 }
+# save(tcv_weight_predictions,file="temp_weight_preds.RData")
+temp_tcv_weight_predictions<-tcv_weight_predictions
+load("temp_weight_preds.RData")
+for (i in 61:115){
+  for (model in 1:length(mw_models)){
+    tcv_weight_predictions[[model]][[i]]<-temp_tcv_weight_predictions[[model]][[i]]
+  }
+}
+save(tcv_weight_predictions,file="new_tcv_preds_MSPE.RData")
+
+# load("./LW_Work/tcv_weight_preds_MSPE.RData")
 
 
-load("./LW_Work/tcv_weight_preds_MSPE.RData")
-
-
-for (model in 1:length(tcv_weight_predictions)){
+for (model in 1:8){
   for (fold in 1:length(unique(sub_mw$ID))){
+  # for (fold in 1:60){
     if (model==1 & fold ==1){
       all_tcv_weight_pred<-data.frame(tcv_weight_predictions[[model]][[fold]],model=rep(model,nrow(tcv_weight_predictions[[model]][[fold]])),fold=rep(fold,nrow(tcv_weight_predictions[[model]][[fold]])))
     } else {
@@ -1400,4 +1438,5 @@ tcv_weight_tow_rel_rmspe_plot<-ggplot()+
 final_weight_rmspe<-data.frame(model=tcv_weight_rmspe$model,kmean=weights_overall_rmspe$rsq_e,logo=tcv_weight_rmspe$rmspe)
 
 final_weight_rmspe
-
+  
+  

@@ -97,7 +97,6 @@ Type objective_function<Type>::operator() (){
   vector<Type> mu_depth(nobs); mu_depth.setZero();  
   for (int i = 0; i < nobs; i++){
     for(int j = 0; j < varmat.cols(); j++){
-      if (j==0) mu_fixed(i) += varmat(i, j) * (beta(j));
       if (j==1) mu_fixed(i) += varmat(i, j) * (beta(j)+beta_b_s(ind_loc(i)));
       if (j==0) mu_s(i) += varmat(i, j) * beta_s(ind_loc(i));
       mu_depth(i) += varmat(i, j) * beta_depth(j) * log(depth(i));
@@ -129,8 +128,8 @@ Type objective_function<Type>::operator() (){
   REPORT(mu_depth);
   ADREPORT(mu);
   ADREPORT(beta);
-  ADREPORT(beta_s);
-  ADREPORT(beta_b_s);
+  // ADREPORT(beta_s);
+  // ADREPORT(beta_b_s);
   ADREPORT(beta_depth);
   ADREPORT(log_phi);
   ADREPORT(log_rho);
